@@ -70,3 +70,16 @@
   border-color: rgba(148,163,184,0.25);
   color: rgba(220,230,240,0.90);
 }
+
+/* Center Value + Unit columns (Debug) */
+#dbg-table th:nth-child(2),
+#dbg-table td:nth-child(2),
+#dbg-table th:nth-child(3),
+#dbg-table td:nth-child(3){
+  text-align: center !important;
+}
+
+#dbg-table .val-badge{
+  text-align: center;
+  min-width: 84px;
+}

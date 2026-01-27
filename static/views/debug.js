@@ -48,12 +48,15 @@ export function renderDebug(payload){
 
   const meta = payload?.meta || {};
   const fr = meta.last_frame || {};
+
+  // Header chip (keep existing top-right meta)
   const metaEl = $("#dbg-meta");
   if(metaEl){
     const id = fr.arb_id ? `0x${Number(fr.arb_id).toString(16)}` : "—";
     metaEl.textContent = `${id} ${fr.name||""} | rx ${meta.rx_total||0}/${meta.rx_decoded||0} | stale ${meta.stale ? "yes":"no"}`;
   }
 
+  // Flags chips
   const flags = payload?.flags || {};
   const flagsEl = $("#dbg-flags");
   if(flagsEl){
@@ -67,39 +70,112 @@ export function renderDebug(payload){
     ].join("");
   }
 
-  const raw = payload?.raw || {};
-  const rows = Object.entries(raw)
-    .filter(([k, s]) => {
-      if(!q) return true;
-      const hay = `${k} ${fmt(s?.v)} ${s?.unit||""}`.toLowerCase();
-      return hay.includes(q);
-    })
-    .sort(([a],[b]) => a.localeCompare(b))
-    .map(([k, s]) => {
+  // Helpers
+  const matchQ = (k, v, unit) => {
+    if(!q) return true;
+    const hay = `${k} ${fmt(v)} ${unit||""}`.toLowerCase();
+    return hay.includes(q);
+  };
+
+  const tableSignals = (title, obj) => {
+    const entries = Object.entries(obj || {})
+      .filter(([k, s]) => matchQ(k, s?.v, s?.unit))
+      .sort(([a],[b]) => a.localeCompare(b));
+
+    const rows = entries.map(([k, s]) => {
       const v = fmt(s?.v);
       const unit = s?.unit || "";
       const age = ms(s?.age);
+      const cls = classifyValue(k, s?.v);
       return `<tr>
         <td class="kbd">${k}</td>
-        <td class="kbd right"><span class="val-badge ${classifyValue(k, s?.v)}">${v}</span></td>
-        <td class="kbd right">${unit}</td>
+        <td class="kbd"><span class="val-badge ${cls}">${v}</span></td>
+        <td class="kbd">${unit}</td>
         <td class="kbd right">${age} ms</td>
       </tr>`;
     }).join("");
 
+    const n = entries.length;
+    return `<details open class="dbg-section">
+      <summary class="kbd">${title} <span class="kbd" style="opacity:.7">(${n})</span></summary>
+      <div class="dbg-section-body">
+        <table class="debug-table">
+          <colgroup>
+            <col class="col-signal" />
+            <col class="col-value" />
+            <col class="col-unit" />
+            <col class="col-age" />
+          </colgroup>
+          <thead><tr>
+            <th>Signal</th><th>Value</th><th>Unit</th><th class="right">Age</th>
+          </tr></thead>
+          <tbody>${rows || `<tr><td colspan="4" class="kbd">—</td></tr>`}</tbody>
+        </table>
+      </div>
+    </details>`;
+  };
+
+  const tableKV = (title, obj) => {
+    const entries = Object.entries(obj || {})
+      .filter(([k, v]) => matchQ(k, v, ""))
+      .sort(([a],[b]) => a.localeCompare(b));
+
+    const rows = entries.map(([k, v]) => {
+      return `<tr>
+        <td class="kbd">${k}</td>
+        <td class="kbd right" colspan="3">${fmt(v)}</td>
+      </tr>`;
+    }).join("");
+
+    const n = entries.length;
+    return `<details class="dbg-section">
+      <summary class="kbd">${title} <span class="kbd" style="opacity:.7">(${n})</span></summary>
+      <div class="dbg-section-body">
+        <table class="debug-table">
+          <colgroup>
+            <col class="col-signal" />
+            <col class="col-value" />
+            <col class="col-unit" />
+            <col class="col-age" />
+          </colgroup>
+          <thead><tr>
+            <th>Key</th><th class="right" colspan="3">Value</th>
+          </tr></thead>
+          <tbody>${rows || `<tr><td colspan="4" class="kbd">—</td></tr>`}</tbody>
+        </table>
+      </div>
+    </details>`;
+  };
+
+  // Sections
+  const sig = payload?.signals || {};
+  const raw = payload?.raw || {};
+  const dev = payload?.dev || {};
+  const compat = payload?.compat?.signals || {};
+  const metaCopy = {
+    rx_total: meta.rx_total,
+    rx_decoded: meta.rx_decoded,
+    last_rx_age_s: meta.last_rx_age_s,
+    stale: meta.stale,
+    last_frame_id: fr.arb_id ? `0x${Number(fr.arb_id).toString(16)}` : null,
+    last_frame_name: fr.name || null,
+    push_hz: meta.push_hz,
+    stale_s: meta.stale_s,
+    src: meta.src,
+    dbc: meta.dbc,
+  };
+
+  const html = [
+    tableSignals("Signals (canonical)", sig),
+    tableSignals("Raw (DBC decode)", raw),
+    tableSignals("Compat (legacy aliases)", compat),
+    tableKV("Dev (derived KPIs)", dev),
+    tableKV("Meta (RX/health)", metaCopy),
+  ].join("");
+
   const tableEl = $("#dbg-table");
   if(tableEl){
-    tableEl.innerHTML = `<table class="debug-table">
-      <colgroup>
-        <col class="col-signal" />
-        <col class="col-value" />
-        <col class="col-unit" />
-        <col class="col-age" />
-      </colgroup>
-      <thead><tr>
-        <th>Signal</th><th class="right">Value</th><th class="right">Unit</th><th class="right">Age</th>
-      </tr></thead>
-      <tbody>${rows || `<tr><td colspan="4" class="kbd">—</td></tr>`}</tbody>
-    </table>`;
+    tableEl.innerHTML = html;
   }
 }
+
