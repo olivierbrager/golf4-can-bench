@@ -57,39 +57,42 @@ ip -details link show can0
 
 
 Tester réception/émission locale :
-
+```bash
 cansend can0 123#1122334455667788
 candump -L can0 -n 3
+```
 
 2) Python venv
+```bash
 cd /home/olivier/ecu_emulator
 python -m venv .venv
 source .venv/bin/activate
 pip install -U pip
 pip install python-can cantools fastapi "uvicorn[standard]" pyyaml
-
+```
 Lancer en manuel (sans systemd)
 TX (émulateur)
+```bash
 cd /home/olivier/ecu_emulator
 source .venv/bin/activate
 uvicorn can_tx_emulator:app --host 0.0.0.0 --port 8000
-
+```
 
 Vérifier que ça émet :
-
+```bash
 candump -L can0 -n 20
-
+```
 RX (liveview)
 
 Exemple (adapter variables si ton liveview les utilise) :
-
+```bash
 cd /home/olivier/ecu_emulator
 source .venv/bin/activate
 
 CAN_CH=can0 DBC_PATH=dbc/golf4_min.dbc PUSH_HZ=15 STALE_S=1.0 \
 SPEED_FACTOR=1.0 MAP_FACTOR=1.0 ATM_KPA=101.3 \
 python -m uvicorn liveview:app --host 0.0.0.0 --port 8010
-
+```
 
 UI :
 
@@ -107,16 +110,17 @@ ExecStart doit être : uvicorn can_tx_emulator:app ...
 WorkingDirectory : /home/olivier/ecu_emulator
 
 Commandes :
-
+```bash
 sudo systemctl enable --now can-tx.service
 systemctl status can-tx.service --no-pager
 journalctl -u can-tx.service -f
-
+```
 RX service (si présent)
+```bash
 sudo systemctl enable --now liveview.service
 systemctl status liveview.service --no-pager
 journalctl -u liveview.service -f
-
+```
 Configuration
 DBC
 
@@ -130,40 +134,41 @@ frames.yaml
 
 frames.yaml pilote ce que le TX émet (période + mapping).
 Si le TX n’émet pas et que le service reste “running”, regarder :
-
+```bash
 journalctl -u can-tx.service -n 200 --no-pager
-
+```
 Troubleshooting
 candump ne montre rien
 
 vérifier can0 UP + bitrate :
-
+```bash
 ip -details link show can0
-
+```
 
 vérifier que le TX tourne :
-
+```bash
 systemctl status can-tx.service --no-pager
-
+```
 
 vérifier erreurs d’encodage DBC (signals manquants, mauvais noms) :
-
+```bash
 journalctl -u can-tx.service -n 200 --no-pager
-
+```
 “address already in use”
 
 Changer le port ou arrêter le service qui occupe le port :
-
+```bash
 sudo ss -ltnp 'sport = :8010'
 sudo systemctl stop liveview.service
-
+```
 Backup GitHub
 
 Utiliser backup.sh (voir ci-dessous) :
-
+```bash
 ./backup.sh "message optionnel"
-
+```
 
 Ou avec remote en argument :
-
+```bash
 ./backup.sh "backup full" git@github.com:olivierbrager/golf4-can-bench.git
+```
