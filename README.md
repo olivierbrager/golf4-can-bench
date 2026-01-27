@@ -51,7 +51,7 @@ Vérifier que ça émet :
 ```bash
 candump -L can0 -n 20
 ```
-RX (liveview)
+## RX (liveview)
 
 Exemple (adapter variables si ton liveview les utilise) :
 ```bash
@@ -63,9 +63,9 @@ SPEED_FACTOR=1.0 MAP_FACTOR=1.0 ATM_KPA=101.3 \
 python -m uvicorn liveview:app --host 0.0.0.0 --port 8010
 ```
 
-UI :
+## UI :
 
-TX UI (si activée dans can_tx_emulator) : http://<ip>:8000
+### TX UI (si activée dans can_tx_emulator) : http://<ip>:8000
 
 Liveview : http://<ip>:8010
 
