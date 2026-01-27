@@ -165,4 +165,4 @@ Utiliser backup.sh (voir ci-dessous) :
 
 Ou avec remote en argument :
 
-./backup.sh "backup full" git@github.com:TON_USER/TON_REPO.git
+./backup.sh "backup full" git@github.com:olivierbrager/golf4-can-bench.git
