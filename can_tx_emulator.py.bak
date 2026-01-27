@@ -14,10 +14,6 @@
 
 import asyncio
 import math
-import os
-import time
-import logging
-
 from dataclasses import dataclass, asdict
 from typing import Any, Dict, Set
 
@@ -89,13 +85,6 @@ clients: Set[WebSocket] = set()
 bus = can.interface.Bus(channel=BUS_CHANNEL, interface=BUS_INTERFACE)
 dbc = DbcCodec(DBC_PATH)
 
-
-
-# -------------------------
-# TX observability
-# -------------------------
-TX_COUNT = 0
-TX_LAST_TS = 0.0
 
 # -------------------------
 # Scenario runner
@@ -606,7 +595,6 @@ async def stop_scenario() -> None:
 # CAN scheduler
 # -------------------------
 async def can_scheduler() -> None:
-    global TX_COUNT, TX_LAST_TS
     tasks = []
 
     # Create periodic tasks once
@@ -643,8 +631,6 @@ async def can_scheduler() -> None:
                 msg.is_extended_id = bool(m.get("extended")) if "extended" in m else _is_extended_from_frame_id(arb_id)
                 msg.data = _pad_to_8(data)
                 task.modify_data(msg)
-                TX_COUNT += 1
-                TX_LAST_TS = time.time()
 
             await asyncio.sleep(0.02)
     finally:
@@ -1060,22 +1046,6 @@ INDEX_HTML = INDEX_HTML.replace("__DBC_PATH__", DBC_PATH)
 
 
 # -------------------------
-# Health
-# -------------------------
-@app.get("/health")
-def health():
-    age = None if TX_LAST_TS == 0 else round(time.time() - TX_LAST_TS, 3)
-    return {
-        "ok": True,
-        "tx_count": TX_COUNT,
-        "tx_last_age_s": age,
-        "bus": {"interface": BUS_INTERFACE, "channel": BUS_CHANNEL},
-        "dbc": DBC_PATH,
-        "messages": [m.get("dbc_message") for m in MESSAGES],
-    }
-
-
-# -------------------------
 # API routes
 # -------------------------
 @app.get("/")
@@ -1122,16 +1092,7 @@ async def api_stop_scenario():
 
 @app.on_event("startup")
 async def startup():
-    log = logging.getLogger("can_tx")
-
-    async def _run_can():
-        try:
-            await can_scheduler()
-        except Exception:
-            log.exception("CAN scheduler crashed — exiting (fail-fast)")
-            os._exit(1)
-
-    asyncio.create_task(_run_can())
+    asyncio.create_task(can_scheduler())
     asyncio.create_task(state_publisher())
 
 
