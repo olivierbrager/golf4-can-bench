@@ -53,6 +53,7 @@ Configurer `can0` à 500k (adapter si besoin) :
 sudo ip link set can0 down || true
 sudo ip link set can0 up type can bitrate 500000
 ip -details link show can0
+```
 
 
 Tester réception/émission locale :
