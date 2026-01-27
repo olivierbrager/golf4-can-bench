@@ -10,6 +10,38 @@ function flagChip(name, on){
   return `<span class="flag ${on ? "on":""}">${name}</span>`;
 }
 
+
+/* ===== Value severity thresholds (Debug) =====
+   - green: within warn band
+   - orange: outside warn band
+   - red: outside bad band
+   Adjust as needed for your setup.
+*/
+const THRESH = {
+  CoolantTemp: { warn: [70, 110], bad: [60, 120] },
+  OilTemp:     { warn: [60, 120], bad: [50, 130] },
+  BatteryV:    { warn: [12.0, 14.8], bad: [11.5, 15.2] },
+  Lambda:      { warn: [0.95, 1.05], bad: [0.85, 1.15] },
+  MAP_kPa:     { warn: [95, 220], bad: [85, 260] },
+  RPM:         { warn: [700, 7000], bad: [400, 8200] },
+  Speed:       { warn: [0, 260], bad: [0, 300] },
+  Throttle:    { warn: [0, 100], bad: [0, 100] },
+  Load:        { warn: [0, 100], bad: [0, 100] },
+};
+
+function classifyValue(signalName, v){
+  const x = Number(v);
+  if(v === null || v === undefined || !Number.isFinite(x)) return "val-na";
+  const t = THRESH[signalName];
+  if(!t) return "val-na";
+  const [wMin, wMax] = t.warn;
+  const [bMin, bMax] = t.bad;
+  if(x < bMin || x > bMax) return "val-bad";
+  if(x < wMin || x > wMax) return "val-warn";
+  return "val-ok";
+}
+
+
 export function renderDebug(payload){
   const qEl = $("#dbg-q");
   const q = (qEl?.value || "").trim().toLowerCase();
@@ -49,7 +81,7 @@ export function renderDebug(payload){
       const age = ms(s?.age);
       return `<tr>
         <td class="kbd">${k}</td>
-        <td class="kbd right">${v}</td>
+        <td class="kbd right"><span class="val-badge ${classifyValue(k, s?.v)}">${v}</span></td>
         <td class="kbd right">${unit}</td>
         <td class="kbd right">${age} ms</td>
       </tr>`;
@@ -57,7 +89,13 @@ export function renderDebug(payload){
 
   const tableEl = $("#dbg-table");
   if(tableEl){
-    tableEl.innerHTML = `<table>
+    tableEl.innerHTML = `<table class="debug-table">
+      <colgroup>
+        <col class="col-signal" />
+        <col class="col-value" />
+        <col class="col-unit" />
+        <col class="col-age" />
+      </colgroup>
       <thead><tr>
         <th>Signal</th><th class="right">Value</th><th class="right">Unit</th><th class="right">Age</th>
       </tr></thead>

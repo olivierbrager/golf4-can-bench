@@ -1,3 +1,72 @@
 .bad{color: rgba(196,0,26,.95)}
 .warn{color: rgba(255,176,0,.95)}
 .ok{color: rgba(46,230,255,.90)}
+
+/* =========================================================
+   DEBUG TABLE — fixed columns, compact, value tags
+   Applies only inside #dbg-table
+   ========================================================= */
+
+#dbg-table table{
+  table-layout: fixed;
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+
+#dbg-table th,
+#dbg-table td{
+  padding: 6px 8px;      /* compact */
+  font-size: 12px;       /* compact */
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Fixed column widths (stable layout) */
+#dbg-table col.col-signal { width: 36%; }
+#dbg-table col.col-value  { width: 22%; }
+#dbg-table col.col-unit   { width: 16%; }
+#dbg-table col.col-age    { width: 26%; }
+
+#dbg-table td.right{
+  text-align: right;
+  font-family: var(--mono);
+}
+
+/* Value badges (scoped, doesn't affect other .ok/.warn/.bad uses) */
+#dbg-table .val-badge{
+  display: inline-block;
+  min-width: 72px;
+  text-align: right;
+  padding: 3px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.10);
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+}
+
+#dbg-table .val-ok{
+  background: rgba(34,197,94,0.14);
+  border-color: rgba(34,197,94,0.35);
+  color: rgba(190,255,220,0.95);
+}
+
+#dbg-table .val-warn{
+  background: rgba(245,158,11,0.14);
+  border-color: rgba(245,158,11,0.35);
+  color: rgba(255,235,200,0.95);
+}
+
+#dbg-table .val-bad{
+  background: rgba(239,68,68,0.14);
+  border-color: rgba(239,68,68,0.35);
+  color: rgba(255,210,210,0.95);
+}
+
+#dbg-table .val-na{
+  background: rgba(148,163,184,0.10);
+  border-color: rgba(148,163,184,0.25);
+  color: rgba(220,230,240,0.90);
+}
