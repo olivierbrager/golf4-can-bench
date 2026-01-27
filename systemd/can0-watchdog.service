@@ -1,0 +1,6 @@
+[Unit]
+Description=Watchdog SocketCAN can0 (reset on BUS-OFF)
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/can0-watchdog.sh

@@ -1,0 +1,14 @@
+[Unit]
+Description=SocketCAN can0 (gs_usb) 500k
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/sbin/ip link set can0 down
+ExecStart=/sbin/ip link set can0 up type can bitrate 500000
+ExecStop=/sbin/ip link set can0 down
+
+[Install]
+WantedBy=multi-user.target

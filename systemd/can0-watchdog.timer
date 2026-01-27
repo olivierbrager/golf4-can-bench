@@ -1,0 +1,10 @@
+[Unit]
+Description=Run can0 watchdog periodically
+
+[Timer]
+OnBootSec=5
+OnUnitActiveSec=2
+
+[Install]
+WantedBy=timers.target
+
