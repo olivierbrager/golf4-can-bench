@@ -18,4 +18,4 @@ venv/
 # CAN logs
 *.can
 *.blf
-EOF
+EOF# CAN logs / captures
