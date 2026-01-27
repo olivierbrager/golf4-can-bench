@@ -1,0 +1,15 @@
+[Unit]
+Description=Golf4 CAN Liveview (Base clean)
+After=network.target
+
+[Service]
+Type=simple
+User=olivier
+WorkingDirectory=/home/olivier/ecu_emulator
+EnvironmentFile=/etc/ecu_emulator/liveview.env
+ExecStart=/home/olivier/ecu_emulator/.venv/bin/python -m uvicorn liveview:app --host ${HOST} --port ${PORT}
+Restart=always
+RestartSec=1
+
+[Install]
+WantedBy=multi-user.target

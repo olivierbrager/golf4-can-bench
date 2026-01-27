@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>CAN Dashboards (Base clean)</title>
+  <link rel="stylesheet" href="/static/styles/base.css">
+  <link rel="stylesheet" href="/static/styles/dev.css">
+  <link rel="stylesheet" href="/static/styles/debug.css">
+</head>
+<body>
+  <div class="wrap">
+    <div class="top">
+      <div class="title">
+        <h1>CAN Dashboards</h1>
+        <div class="sub">Base clean — Dev/Debug invariants</div>
+      </div>
+      <div class="pill">
+        <span class="dot" id="dot"></span>
+        <span id="ws">connecting</span>
+      </div>
+    </div>
+
+    <div class="top" style="margin-top:0">
+      <div class="tabs" id="tabs">
+        <div class="tab active" data-view="debug">Debug</div>
+        <div class="tab" data-view="dev">Dev</div>
+        <div class="tab" data-view="street">Street</div>
+        <div class="tab" data-view="race">Race</div>
+      </div>
+
+      <div class="pill">
+        <span class="kbd" id="src">—</span>
+      </div>
+    </div>
+
+    <div class="view active" id="view-debug">
+      <div class="card">
+        <div class="head">
+          <h2>Debug</h2>
+          <div class="meta">Tout le payload (raw + flags + meta). Recherche + âges.</div>
+        </div>
+        <div class="body">
+          <div class="row">
+            <input id="dbg-q" placeholder="Filtrer (ex: RPM, MAP, 0x280)…" />
+            <div class="pill small"><span class="kbd" id="dbg-meta">—</span></div>
+          </div>
+          <div class="sp10"></div>
+          <div id="dbg-flags" class="flags"></div>
+          <div class="sp10"></div>
+          <div id="dbg-table"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="view" id="view-dev">
+      <div class="card">
+        <div class="head">
+          <h2>Dev</h2>
+          <div class="meta">KPIs + fenêtre glissante 5s (BoostMax5, LambdaMin/Max)</div>
+        </div>
+        <div class="body">
+          <div id="dev-kpis" class="kpis"></div>
+          <div class="sp10"></div>
+          <div class="flags" id="dev-flags"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="view" id="view-street">
+      <div class="card"><div class="head"><h2>Street</h2><div class="meta">Désactivé pour l’instant.</div></div>
+        <div class="body"><div class="sub">On y revient après Dev/Debug.</div></div>
+      </div>
+    </div>
+
+    <div class="view" id="view-race">
+      <div class="card"><div class="head"><h2>Race</h2><div class="meta">Désactivé pour l’instant.</div></div>
+        <div class="body"><div class="sub">On y revient après Dev/Debug.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="/static/app.js?v=baseclean1"></script>
+</body>
+</html>

@@ -1,0 +1,32 @@
+bus:
+  interface: socketcan
+  channel: can0
+
+dbc:
+  file: dbc/golf4_min.dbc
+
+messages:
+  - name: engine_fast
+    dbc_message: EngineFast
+    period_ms: 20
+    signals:
+      RPM: rpm
+      Throttle: throttle
+      Load: load
+      Speed: speed
+      MAP_kPa: map_kpa
+
+  - name: engine_status
+    dbc_message: EngineStatus
+    period_ms: 100
+    signals:
+      CoolantTemp: coolant
+      OilTemp: oil_temp
+      BatteryV: battery_voltage
+      Lambda: lambda_value
+      MIL: mil
+      EPC: epc
+      Fan: fan_request
+      Cruise: cruise_active
+      BrakeSwitch: brake_switch
+      ClutchSwitch: clutch_switch

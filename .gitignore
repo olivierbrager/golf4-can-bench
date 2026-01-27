@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.py[cod]
+
+# Virtualenv
+.venv/
+venv/
+
+# Logs / runtime
+*.log
+*.pid
+
+# OS / editor
+.DS_Store
+.vscode/
+.idea/
+
+# CAN logs
+*.can
+*.blf
+EOF
