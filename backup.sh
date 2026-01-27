@@ -107,4 +107,4 @@ else
   echo "[backup] Run: ./backup.sh \"msg\" git@github.com:USER/REPO.git"
   exit 2
 fi
-EOF
+
