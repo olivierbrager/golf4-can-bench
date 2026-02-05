@@ -44,7 +44,9 @@ class CanReader:
                     msg = bus.recv(timeout=1.0)
                     if msg is None:
                         continue
-                    ts = float(getattr(msg, "timestamp", 0.0) or now_s())
+                    ts = float(getattr(msg, "timestamp", 0.0) or 0.0)
+                    if ts < 1_000_000_000.0:
+                        ts = now_s()
                     self.state.bump_rx(msg.arbitration_id, ts)
                     METRICS.on_rx(ts)
 
