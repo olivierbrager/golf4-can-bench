@@ -5,7 +5,7 @@ import json
 import time
 from typing import Any, Dict, Optional
 
-from fastapi import FastAPI, WebSocket
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
@@ -13,6 +13,7 @@ from dbc_codec import DbcCodec
 from model import CanonicalState
 
 from can_reader import CanReader
+from debug_utils import DEBUG, METRICS, log_debug, log_error, log_info
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 WEBUI_DIR = os.path.join(BASE_DIR, "webui")
@@ -138,6 +139,8 @@ def metrics() -> JSONResponse:
     conv = {"SPEED_FACTOR": SPEED_FACTOR, "MAP_FACTOR": MAP_FACTOR, "ATM_KPA": ATM_KPA}
     snap = state.payload(CAN_CH, dbc_name, PUSH_HZ, conv)
     snap = _augment_payload(snap)
+    if DEBUG:
+        snap["debug_metrics"] = METRICS.snapshot()
     return JSONResponse(snap)
 
 
@@ -149,9 +152,25 @@ async def ws(ws: WebSocket):
     period = 1.0 / max(1.0, PUSH_HZ)
     dbc_name = os.path.basename(DBC_PATH)
     conv = {"SPEED_FACTOR": SPEED_FACTOR, "MAP_FACTOR": MAP_FACTOR, "ATM_KPA": ATM_KPA}
+    METRICS.on_ws_connected()
+    log_info("liveview", "ws_connected", ws_clients=METRICS.ws_clients_connected)
 
-    while True:
-        payload = state.payload(CAN_CH, dbc_name, PUSH_HZ, conv)
-        payload = _augment_payload(payload)
-        await ws.send_text(json.dumps(payload, separators=(",", ":")))
-        await asyncio.sleep(period)
+    try:
+        while True:
+            payload = state.payload(CAN_CH, dbc_name, PUSH_HZ, conv)
+            payload = _augment_payload(payload)
+            try:
+                await ws.send_text(json.dumps(payload, separators=(",", ":")))
+                METRICS.on_ws_sent()
+            except Exception as exc:
+                METRICS.on_ws_dropped()
+                log_error("liveview", "ws_send_error", err=str(exc), dropped=1)
+                break
+            await asyncio.sleep(period)
+    except WebSocketDisconnect:
+        log_debug("liveview", "ws_disconnected")
+    except Exception as exc:
+        log_error("liveview", "ws_error", err=str(exc))
+    finally:
+        METRICS.on_ws_disconnected()
+        log_info("liveview", "ws_closed", ws_clients=METRICS.ws_clients_connected)
