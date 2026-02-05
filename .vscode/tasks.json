@@ -1,0 +1,56 @@
+{
+  // VS Code tasks for this repo. Uses existing commands from README.md.
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Backend: TX emulator (dev/debug)",
+      "type": "shell",
+      "command": "./.venv/bin/uvicorn",
+      "args": [
+        "can_tx_emulator:app",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "8000"
+      ],
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "Frontend: Liveview (RX)",
+      "type": "shell",
+      "command": "./.venv/bin/python",
+      "args": [
+        "-m",
+        "uvicorn",
+        "liveview:app",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "8010"
+      ],
+      "options": {
+        "env": {
+          "CAN_CH": "can0",
+          "DBC_PATH": "dbc/golf4_min.dbc",
+          "PUSH_HZ": "15",
+          "STALE_S": "1.0",
+          "SPEED_FACTOR": "1.0",
+          "MAP_FACTOR": "1.0",
+          "ATM_KPA": "101.3"
+        }
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    }
+
+    // Tests: no test runner/config found in repo.
+    // If you add one (e.g., pytest), add a task here using the existing command.
+  ]
+}
