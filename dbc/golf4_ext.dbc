@@ -1,0 +1,115 @@
+VERSION ""
+
+NS_ :
+	NS_DESC_
+	CM_
+	BA_DEF_
+	BA_
+	VAL_
+	CAT_DEF_
+	CAT_
+	FILTER
+	BA_DEF_DEF_
+	EV_DATA_
+	ENVVAR_DATA_
+	SGTYPE_
+	SGTYPE_VAL_
+	BA_DEF_SGTYPE_
+	BA_SGTYPE_
+	SIG_TYPE_REF_
+	VAL_TABLE_
+	SIG_GROUP_
+	SIG_VALTYPE_
+	SIGTYPE_VALTYPE_
+	BO_TX_BU_
+	BA_DEF_REL_
+	BA_REL_
+	BA_DEF_DEF_REL_
+	BU_SG_REL_
+	BU_EV_REL_
+	BU_BO_REL_
+	SG_MUL_VAL_
+
+BS_:
+
+BU_: Vector__XXX
+
+CM_ "Golf4 CAN Bench extended DBC (Turbo/E85/DSG + sensors)";
+
+
+BO_ 640 EngineFast: 8 Vector__XXX
+ SG_ RPM : 0|16@1+ (1,0) [0|9000] "rpm" Vector__XXX
+ SG_ Throttle : 16|8@1+ (0.5,0) [0|100] "%" Vector__XXX
+ SG_ Load : 24|8@1+ (0.5,0) [0|100] "%" Vector__XXX
+ SG_ Speed : 32|16@1+ (0.1,0) [0|300] "km/h" Vector__XXX
+ SG_ MAP_kPa : 48|16@1+ (0.1,0) [0|300] "kPa" Vector__XXX
+
+BO_ 648 EngineStatus: 8 Vector__XXX
+ SG_ CoolantTemp : 0|8@1+ (1,-40) [-40|215] "C" Vector__XXX
+ SG_ OilTemp : 8|8@1+ (1,-40) [-40|215] "C" Vector__XXX
+ SG_ BatteryV : 16|8@1+ (0.1,0) [0|25.5] "V" Vector__XXX
+ SG_ Lambda : 24|8@1+ (0.01,0) [0|2.55] "" Vector__XXX
+ SG_ MIL : 32|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ EPC : 33|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ Fan : 34|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ Cruise : 35|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ BrakeSwitch : 36|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ ClutchSwitch : 37|1@1+ (1,0) [0|1] "" Vector__XXX
+
+
+CM_ BO_ 656 "Primary sensors & pressures (IAT/AFR/Fuel/Oil/EGT)";
+
+BO_ 656 EngineSensors: 8 Vector__XXX
+ SG_ IAT_C : 0|8@1+ (1,-40) [-40|215] "C" Vector__XXX
+ SG_ AFR : 8|8@1+ (0.1,0) [0|25.5] "" Vector__XXX
+ SG_ FuelPressure_kPa : 16|16@1+ (1,0) [0|2000] "kPa" Vector__XXX
+ SG_ OilPressure_kPa : 32|16@1+ (1,0) [0|2000] "kPa" Vector__XXX
+ SG_ EGT_C : 48|16@1+ (1,0) [0|1200] "C" Vector__XXX
+
+CM_ BO_ 657 "Boost control & targets";
+
+BO_ 657 BoostControl: 8 Vector__XXX
+ SG_ BoostTarget_kPa : 0|16@1+ (0.1,0) [0|300] "kPa" Vector__XXX
+ SG_ BoostError_kPa : 16|16@1- (0.1,0) [-300|300] "kPa" Vector__XXX
+ SG_ WGDC_pct : 32|8@1+ (0.5,0) [0|100] "%" Vector__XXX
+ SG_ N75_pct : 40|8@1+ (0.5,0) [0|100] "%" Vector__XXX
+ SG_ TurboSpeed_krpm : 48|16@1+ (0.1,0) [0|400] "krpm" Vector__XXX
+
+CM_ BO_ 658 "Ignition, injector, trims";
+
+BO_ 658 FuelIgnition: 8 Vector__XXX
+ SG_ IgnAngle_deg : 0|16@1- (0.1,0) [-30|60] "deg" Vector__XXX
+ SG_ Dwell_ms : 16|8@1+ (0.05,0) [0|12.75] "ms" Vector__XXX
+ SG_ InjPW_ms : 24|8@1+ (0.05,0) [0|12.75] "ms" Vector__XXX
+ SG_ FuelTrimST_pct : 32|8@1- (0.5,0) [-100|100] "%" Vector__XXX
+ SG_ FuelTrimLT_pct : 40|8@1- (0.5,0) [-100|100] "%" Vector__XXX
+ SG_ LambdaTarget : 48|8@1+ (0.01,0) [0|2.55] "" Vector__XXX
+ SG_ FuelTemp_C : 56|8@1+ (1,-40) [-40|215] "C" Vector__XXX
+
+CM_ BO_ 659 "E85 & fuel composition";
+
+BO_ 659 Ethanol: 8 Vector__XXX
+ SG_ Ethanol_pct : 0|8@1+ (0.5,0) [0|100] "%" Vector__XXX
+ SG_ StoichAFR : 8|8@1+ (0.1,0) [8|20] "" Vector__XXX
+ SG_ FlexFuelMode : 16|2@1+ (1,0) [0|3] "" Vector__XXX
+ SG_ FuelDensity : 24|8@1+ (0.1,0) [0|25.5] "" Vector__XXX
+
+CM_ BO_ 660 "Knock & safety";
+
+BO_ 660 Knock: 8 Vector__XXX
+ SG_ KnockRetard_deg : 0|16@1+ (0.1,0) [0|20] "deg" Vector__XXX
+ SG_ KnockCount : 16|16@1+ (1,0) [0|65535] "" Vector__XXX
+ SG_ IATComp_pct : 32|8@1- (0.5,0) [-50|50] "%" Vector__XXX
+ SG_ EGTAlarm : 40|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ OilPressAlarm : 41|1@1+ (1,0) [0|1] "" Vector__XXX
+
+CM_ BO_ 672 "DSG basic telemetry (generic)";
+
+BO_ 672 DSG: 8 Vector__XXX
+ SG_ Gear : 0|8@1+ (1,0) [0|10] "" Vector__XXX
+ SG_ ClutchSlip_rpm : 8|16@1+ (1,0) [0|5000] "rpm" Vector__XXX
+ SG_ TransTemp_C : 24|8@1+ (1,-40) [-40|215] "C" Vector__XXX
+ SG_ Mode : 32|3@1+ (1,0) [0|7] "" Vector__XXX
+ SG_ ShiftRequest : 40|2@1+ (1,0) [0|3] "" Vector__XXX
+ SG_ LaunchActive : 48|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ TCU_Ready : 49|1@1+ (1,0) [0|1] "" Vector__XXX

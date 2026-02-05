@@ -3,7 +3,7 @@ bus:
   channel: can0
 
 dbc:
-  file: dbc/golf4_min.dbc
+  file: dbc/golf4_ext.dbc
 
 messages:
   - name: engine_fast
@@ -30,3 +30,66 @@ messages:
       Cruise: cruise_active
       BrakeSwitch: brake_switch
       ClutchSwitch: clutch_switch
+
+  - name: engine_sensors
+    dbc_message: EngineSensors
+    period_ms: 100
+    signals:
+      IAT_C: iat
+      AFR: afr
+      FuelPressure_kPa: fuel_pressure_kpa
+      OilPressure_kPa: oil_pressure_kpa
+      EGT_C: egt_c
+
+  - name: boost_control
+    dbc_message: BoostControl
+    period_ms: 50
+    signals:
+      BoostTarget_kPa: boost_target_kpa
+      BoostError_kPa: boost_error_kpa
+      WGDC_pct: wgdc_pct
+      N75_pct: n75_pct
+      TurboSpeed_krpm: turbo_speed_krpm
+
+  - name: fuel_ignition
+    dbc_message: FuelIgnition
+    period_ms: 50
+    signals:
+      IgnAngle_deg: ign_angle_deg
+      Dwell_ms: dwell_ms
+      InjPW_ms: inj_pw_ms
+      FuelTrimST_pct: fuel_trim_st
+      FuelTrimLT_pct: fuel_trim_lt
+      LambdaTarget: lambda_target
+      FuelTemp_C: fuel_temp_c
+
+  - name: ethanol
+    dbc_message: Ethanol
+    period_ms: 200
+    signals:
+      Ethanol_pct: ethanol_pct
+      StoichAFR: stoich_afr
+      FlexFuelMode: flex_mode
+      FuelDensity: fuel_density
+
+  - name: knock
+    dbc_message: Knock
+    period_ms: 100
+    signals:
+      KnockRetard_deg: knock_retard_deg
+      KnockCount: knock_count
+      IATComp_pct: iat_comp_pct
+      EGTAlarm: egt_alarm
+      OilPressAlarm: oil_press_alarm
+
+  - name: dsg
+    dbc_message: DSG
+    period_ms: 50
+    signals:
+      Gear: dsg_gear
+      ClutchSlip_rpm: dsg_clutch_slip_rpm
+      TransTemp_C: dsg_trans_temp_c
+      Mode: dsg_mode
+      ShiftRequest: dsg_shift_request
+      LaunchActive: launch_active
+      TCU_Ready: tcu_ready

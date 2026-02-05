@@ -80,6 +80,46 @@ class ECUState:
     # Cluster counter
     counter: int = 0
 
+    # --- Extended sensors / turbo / flex / dsg ---
+    iat: float = 30.0
+    afr: float = 14.7
+    fuel_pressure_kpa: float = 400.0
+    oil_pressure_kpa: float = 250.0
+    egt_c: float = 650.0
+    
+    boost_target_kpa: float = 180.0
+    boost_error_kpa: float = 0.0
+    wgdc_pct: float = 35.0
+    n75_pct: float = 35.0
+    turbo_speed_krpm: float = 80.0
+    
+    ign_angle_deg: float = 10.0
+    dwell_ms: float = 2.5
+    inj_pw_ms: float = 3.0
+    fuel_trim_st: float = 0.0
+    fuel_trim_lt: float = 0.0
+    lambda_target: float = 1.00
+    fuel_temp_c: float = 25.0
+    
+    ethanol_pct: float = 0.0
+    stoich_afr: float = 14.7
+    flex_mode: int = 0
+    fuel_density: float = 7.4
+    
+    knock_retard_deg: float = 0.0
+    knock_count: int = 0
+    iat_comp_pct: float = 0.0
+    egt_alarm: int = 0
+    oil_press_alarm: int = 0
+    
+    dsg_gear: int = 1
+    dsg_clutch_slip_rpm: int = 0
+    dsg_trans_temp_c: float = 60.0
+    dsg_mode: int = 1
+    dsg_shift_request: int = 0
+    launch_active: int = 0
+    tcu_ready: int = 1
+    
 
 state = ECUState()
 
@@ -295,6 +335,54 @@ async def run_scenario(name: str) -> None:
             state.driver_torque_req = float(clamp(-20 + t * 420, -500, 500))
             state.indicated_torque = float(clamp(0 + t * 450, -500, 500))
             state.lambda_value = float(clamp(1.05 - t * 0.20, 0.5, 1.5))
+            # crude but useful dev dynamics (keeps debug alive)
+            state.boost_target_kpa = max(100.0, min(260.0, 100.0 + state.throttle * 1.6))
+            state.boost_error_kpa = (state.boost_target_kpa - state.map_kpa)
+            
+            state.wgdc_pct = max(0.0, min(100.0, 20.0 + state.throttle * 0.8))
+            state.n75_pct = state.wgdc_pct
+            state.turbo_speed_krpm = max(0.0, min(250.0, state.rpm / 60.0))
+            
+            # FlexFuel: ethanol ramps slowly toward target set by scenario (if you have one)
+            # keep stoich coherent
+            state.stoich_afr = 14.7 - (state.ethanol_pct / 100.0) * 5.0  # ~14.7 -> ~9.7
+            state.flex_mode = 1 if state.ethanol_pct > 5 else 0
+            
+            # Lambda/AFR
+            state.lambda_target = 1.00 if state.throttle < 20 else 0.85
+            state.lambda_value = max(0.70, min(1.30, state.lambda_target + (state.fuel_trim_st / 200.0)))
+            state.afr = state.stoich_afr * state.lambda_value
+            
+            # Trims + inj
+            state.fuel_trim_st = max(-15.0, min(15.0, (1.0 - state.lambda_value) * 20.0))
+            state.fuel_trim_lt = max(-10.0, min(10.0, state.fuel_trim_lt + state.fuel_trim_st * 0.01))
+            state.inj_pw_ms = max(1.0, min(12.0, 2.5 + state.load * 0.04))
+            state.ign_angle_deg = max(-10.0, min(35.0, 12.0 - (state.map_kpa - 100.0) * 0.05))
+            
+            # Pressures / temps
+            state.fuel_pressure_kpa = 350.0 + state.load * 3.0
+            state.oil_pressure_kpa = 120.0 + state.rpm * 0.06
+            state.iat = 25.0 + (state.map_kpa - 100.0) * 0.08
+            state.egt_c = 450.0 + state.load * 4.0
+            
+            state.oil_press_alarm = 1 if (state.rpm > 2000 and state.oil_pressure_kpa < 140.0) else 0
+            state.egt_alarm = 1 if state.egt_c > 980.0 else 0
+            
+            # DSG (very rough)
+            if state.speed < 5:
+                state.dsg_gear = 1
+            elif state.speed < 30:
+                state.dsg_gear = 2
+            elif state.speed < 55:
+                state.dsg_gear = 3
+            elif state.speed < 85:
+                state.dsg_gear = 4
+            elif state.speed < 120:
+                state.dsg_gear = 5
+            else:
+                state.dsg_gear = 6
+            state.dsg_trans_temp_c = max(40.0, min(130.0, state.dsg_trans_temp_c + (state.load/100.0)*0.2))
+            state.tcu_ready = 1
             await asyncio.sleep(duration / steps)
         return
 
