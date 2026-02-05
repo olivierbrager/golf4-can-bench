@@ -8,7 +8,7 @@ import can
 
 from dbc_codec import DbcCodec
 from model import CanonicalState, now_s
-from debug_utils import METRICS, log_debug, log_error, log_info
+from debug_instrumentation import METRICS, log
 
 MAP_KEYS = ("MAP_kPa", "MAP", "MAPAbs_kPa", "ManifoldAbs", "ManifoldPressure")
 
@@ -39,21 +39,22 @@ class CanReader:
             bus = None
             try:
                 bus = can.Bus(interface="socketcan", channel=self.can_ch, receive_own_messages=True)
-                log_info("can_reader", "bus_open", bus=self.can_ch)
+                log("can_reader", "bus_open", level="info", bus=self.can_ch)
                 while True:
                     msg = bus.recv(timeout=1.0)
                     if msg is None:
                         continue
                     ts = float(getattr(msg, "timestamp", 0.0) or now_s())
                     self.state.bump_rx(msg.arbitration_id, ts)
-                    METRICS.on_rx_frame(ts)
+                    METRICS.on_rx(ts)
 
                     decoded = self.codec.decode(msg.arbitration_id, msg.data, ts=ts)
                     if not decoded:
-                        METRICS.on_decode_unknown()
-                        log_debug(
+                        METRICS.inc("decode_unknown_id_total", 1.0)
+                        log(
                             "can_reader",
                             "decode_unknown_id",
+                            level="debug",
                             can_id=msg.arbitration_id,
                             dlc=len(getattr(msg, "data", []) or []),
                             bus=self.can_ch,
@@ -117,7 +118,7 @@ class CanReader:
                         self.state.update_derived_dev(boost, lam, ts)
 
             except Exception as exc:
-                log_error("can_reader", "rx_error", bus=self.can_ch, err=str(exc))
+                log("can_reader", "rx_error", level="error", bus=self.can_ch, err=str(exc))
                 try:
                     if bus is not None:
                         bus.shutdown()

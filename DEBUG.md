@@ -13,6 +13,10 @@ Format commun:
 - `component`, `event`, `level`
 - Champs optionnels selon contexte: `can_id`, `dlc`, `bus`, `ws_clients`, `queue_len`, `dropped`, `err`
 
+Lecture rapide:
+- Les logs sont écrits sur stdout en JSON (une ligne par événement).
+- Exemple de visualisation: `python -m uvicorn liveview:app ... | jq -c .`
+
 Exemples d’événements:
 - `can_reader.bus_open`
 - `can_reader.decode_unknown_id`
@@ -22,6 +26,7 @@ Exemples d’événements:
 
 ## Métriques (mémoire, Debug uniquement)
 Les métriques sont maintenues en mémoire et exposées dans `GET /metrics` sous `debug_metrics`.
+En dehors du Debug, `debug_metrics` est absent pour minimiser l’overhead.
 
 - `rx_frames_total`
 - `rx_frames_per_sec` (moyenne glissante sur ~5s)

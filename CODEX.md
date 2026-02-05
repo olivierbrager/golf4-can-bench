@@ -22,6 +22,7 @@ Invariants concrets:
 - Exécuter tests/lint.
 - Vérifier le diff.
 - Committer.
+- Si un point est bloqué (tests indisponibles, outils manquants), documenter la raison dans le commit/PR.
 
 ## 5) Règle repo: `.vscode/` versionné
 Le dossier `.vscode/` est versionné volontairement pour standardiser l’expérience VS Code et réduire les écarts de configuration entre contributeurs.
