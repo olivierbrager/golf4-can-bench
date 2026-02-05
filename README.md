@@ -63,11 +63,64 @@ SPEED_FACTOR=1.0 MAP_FACTOR=1.0 ATM_KPA=101.3 \
 python -m uvicorn liveview:app --host 0.0.0.0 --port 8010
 ```
 
-## UI :
+## UI
 
 ### TX UI (si activée dans can_tx_emulator) : http://<ip>:8000
 
-Liveview : http://<ip>:8010
+### Liveview : http://<ip>:8010
+
+#### Interface (Liveview)
+- Barre du haut : état WebSocket (`connected/connecting`), latence visuelle via le point (vert/rouge).
+- Barre info CAN/DBC : source CAN, DBC chargé, compteurs RX et indicateur `stale`.
+- Onglets : `Debug` (payload complet), `Dev` (KPIs + dérivés), `Street`/`Race` (placeholders).
+- Debug :
+  - Filtre plein‑texte (ex: `RPM`, `MAP`, `0x280`) sur le payload.
+  - Flags (MIL/EPC/Fan/…).
+  - Table signals + âges (`age`) en secondes.
+- Dev :
+  - KPIs dérivés (fenêtre glissante 5s).
+  - Flags synthétiques.
+
+#### Snapshots (extraits)
+Status line (barre info CAN/DBC) :
+```
+CAN:can0 | DBC:golf4_min.dbc | rx:115482/47736 | stale:yes
+```
+
+Snapshot payload (extrait /metrics) :
+```json
+{
+  "meta": {
+    "src": "can0",
+    "dbc": "golf4_min.dbc",
+    "rx_total": 115482,
+    "rx_decoded": 47736,
+    "last_rx_age_s": 125.6694688796997,
+    "stale": true,
+    "push_hz": 15.0
+  },
+  "flags": {
+    "MIL": 0,
+    "EPC": 0,
+    "Fan": 0,
+    "Cruise": 0,
+    "Brake": 0,
+    "Clutch": 0
+  },
+  "dev": {
+    "BoostMax5": 0.9390000000000002,
+    "LambdaMin5": 0.001,
+    "LambdaMax5": 0.058
+  },
+  "compat.signals": {
+    "rpm": {"v": 1329.75, "unit": "rpm", "age": 125.67373180389404},
+    "speed": {"v": 37.0, "unit": "kmh", "age": 125.6737380027771},
+    "throttle": {"v": 49.0, "unit": "%", "age": 125.67374205589294},
+    "map_kpa": {"v": 165.8, "unit": "kPa", "age": 125.67374968528748},
+    "boost": {"v": 0.6450000000000001, "unit": "bar", "age": 125.67375326156616}
+  }
+}
+```
 
 Lancer via systemd (recommandé)
 TX service
