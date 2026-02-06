@@ -1,10 +1,11 @@
 # Golf 4 CAN Bench — ECU Emulator (TX) + Liveview (RX)
 
 This repo contains:
-- **can_tx_emulator.py**: ECU emulator that **transmits** CAN frames on SocketCAN (TX), encoded via `dbc/golf4_min.dbc`.
+- **can_tx_emulator.py**: ECU emulator that **transmits** CAN frames on SocketCAN (TX), encoded via the selected DBC.
 - **liveview.py**: dashboard / viewer that **reads** CAN (RX), decodes via the DBC, and exposes a web UI.
 - **frames.yaml**: emitted frame configuration (periods + signal-to-state mapping).
-- **dbc/golf4_min.dbc**: minimal DBC (messages: `EngineFast` and `EngineStatus`).
+- **dbc/golf4_min.dbc**: minimal DBC (2 messages).
+- **dbc/golf4_ext.dbc**: extended DBC (8 messages).
 
 ## Prerequisites
 - Linux with SocketCAN (can-utils recommended)
