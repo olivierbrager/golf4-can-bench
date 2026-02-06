@@ -67,6 +67,9 @@ python -m uvicorn liveview:app --host 0.0.0.0 --port 8010
 
 ### TX UI (si activée dans can_tx_emulator) : http://<ip>:8000
 
+#### Snapshot (ECU Emulator)
+![ECU Emulator](docs/snapshots/ecu-emulator.png)
+
 ### Liveview : http://<ip>:8010
 
 #### Interface (Liveview)
@@ -80,6 +83,13 @@ python -m uvicorn liveview:app --host 0.0.0.0 --port 8010
 - Dev :
   - KPIs dérivés (fenêtre glissante 5s).
   - Flags synthétiques.
+
+#### Snapshots (UI)
+Debug :
+![Liveview Debug](docs/snapshots/liveview-debug.png)
+
+Dev :
+![Liveview Dev](docs/snapshots/liveview-dev.png)
 
 #### Snapshots (extraits)
 Status line (barre info CAN/DBC) :
