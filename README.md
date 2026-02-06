@@ -96,40 +96,60 @@ Dev:
 #### Snapshots (snippets)
 Status line (CAN/DBC info bar):
 ```
-CAN:can0 | DBC:golf4_min.dbc | rx:115482/47736 | stale:yes
+CAN:can0 | DBC:golf4_min.dbc | rx:54632/22588 | stale:no
 ```
 
 Snapshot payload (excerpt from /metrics):
 ```json
 {
-  "meta": {
-    "src": "can0",
-    "dbc": "golf4_min.dbc",
-    "rx_total": 115482,
-    "rx_decoded": 47736,
-    "last_rx_age_s": 125.6694688796997,
-    "stale": true,
-    "push_hz": 15.0
-  },
-  "flags": {
-    "MIL": 0,
-    "EPC": 0,
-    "Fan": 0,
-    "Cruise": 0,
-    "Brake": 0,
-    "Clutch": 0
+  "compat.signals": {
+    "boost": {
+      "age": 0.006264209747314453,
+      "unit": "bar",
+      "v": 0.05000000000000014
+    },
+    "map_kpa": {
+      "age": 0.00626063346862793,
+      "unit": "kPa",
+      "v": 106.30000000000001
+    },
+    "rpm": {
+      "age": 0.0062427520751953125,
+      "unit": "rpm",
+      "v": 1167.5
+    },
+    "speed": {
+      "age": 0.006248950958251953,
+      "unit": "kmh",
+      "v": 122.0
+    },
+    "throttle": {
+      "age": 0.00625300407409668,
+      "unit": "%",
+      "v": 9.0
+    }
   },
   "dev": {
     "BoostMax5": 0.9390000000000002,
-    "LambdaMin5": 0.001,
-    "LambdaMax5": 0.058
+    "LambdaMax5": 0.058,
+    "LambdaMin5": 0.001
   },
-  "compat.signals": {
-    "rpm": {"v": 1329.75, "unit": "rpm", "age": 125.67373180389404},
-    "speed": {"v": 37.0, "unit": "kmh", "age": 125.6737380027771},
-    "throttle": {"v": 49.0, "unit": "%", "age": 125.67374205589294},
-    "map_kpa": {"v": 165.8, "unit": "kPa", "age": 125.67374968528748},
-    "boost": {"v": 0.6450000000000001, "unit": "bar", "age": 125.67375326156616}
+  "flags": {
+    "Brake": 0,
+    "Clutch": 0,
+    "Cruise": 0,
+    "EPC": 0,
+    "Fan": 0,
+    "MIL": 0
+  },
+  "meta": {
+    "dbc": "golf4_min.dbc",
+    "last_rx_age_s": 0.006221294403076172,
+    "push_hz": 15.0,
+    "rx_decoded": 22588,
+    "rx_total": 54632,
+    "src": "can0",
+    "stale": false
   }
 }
 ```
