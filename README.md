@@ -1,31 +1,30 @@
 # Golf 4 CAN Bench — ECU Emulator (TX) + Liveview (RX)
 
-Ce repo contient :
-- **can_tx_emulator.py** : émulateur ECU qui **émet** des trames CAN sur SocketCAN (TX) en encodant via `dbc/golf4_min.dbc`.
-- **liveview.py** : dashboard / viewer qui **lit** le CAN (RX), décode via le DBC et expose une UI web.
-- **frames.yaml** : configuration des trames émises (périodes + mapping signaux -> champs d’état).
-- **dbc/golf4_min.dbc** : DBC minimal (messages : `EngineFast` et `EngineStatus`).
+This repo contains:
+- **can_tx_emulator.py**: ECU emulator that **transmits** CAN frames on SocketCAN (TX), encoded via `dbc/golf4_min.dbc`.
+- **liveview.py**: dashboard / viewer that **reads** CAN (RX), decodes via the DBC, and exposes a web UI.
+- **frames.yaml**: emitted frame configuration (periods + signal-to-state mapping).
+- **dbc/golf4_min.dbc**: minimal DBC (messages: `EngineFast` and `EngineStatus`).
 
-## Prérequis
-- Linux avec SocketCAN (can-utils recommandé)
+## Prerequisites
+- Linux with SocketCAN (can-utils recommended)
 - Python 3.x + venv
-- Accès à une interface CAN `can0` (ex: gs_usb)
+- Access to a CAN interface `can0` (e.g. gs_usb)
 
-Paquets Python :
+Python packages:
 - `python-can`, `cantools`, `fastapi`, `uvicorn[standard]`, `pyyaml`
 
-## Setup rapide
+## Quick setup
 
 ### 1) CAN interface
-Configurer `can0` à 500k (adapter si besoin) :
+Configure `can0` at 500k (adjust if needed):
 ```bash
 sudo ip link set can0 down || true
 sudo ip link set can0 up type can bitrate 500000
 ip -details link show can0
 ```
 
-
-Tester réception/émission locale :
+Test local RX/TX:
 ```bash
 cansend can0 123#1122334455667788
 candump -L can0 -n 3
@@ -39,21 +38,23 @@ source .venv/bin/activate
 pip install -U pip
 pip install python-can cantools fastapi "uvicorn[standard]" pyyaml
 ```
-Lancer en manuel (sans systemd)
-TX (émulateur)
+
+Manual run (without systemd)
+TX (emulator)
 ```bash
 cd /home/olivier/ecu_emulator
 source .venv/bin/activate
 uvicorn can_tx_emulator:app --host 0.0.0.0 --port 8000
 ```
 
-Vérifier que ça émet :
+Verify that it is transmitting:
 ```bash
 candump -L can0 -n 20
 ```
+
 ## RX (liveview)
 
-Exemple (adapter variables si ton liveview les utilise) :
+Example (adjust variables if your liveview uses them):
 ```bash
 cd /home/olivier/ecu_emulator
 source .venv/bin/activate
@@ -65,39 +66,39 @@ python -m uvicorn liveview:app --host 0.0.0.0 --port 8010
 
 ## UI
 
-### TX UI (si activée dans can_tx_emulator) : http://<ip>:8000
+### TX UI (if enabled in can_tx_emulator): http://<ip>:8000
 
 #### Snapshot (ECU Emulator)
 ![ECU Emulator](docs/snapshots/ecu-emulator.png)
 
-### Liveview : http://<ip>:8010
+### Liveview: http://<ip>:8010
 
 #### Interface (Liveview)
-- Barre du haut : état WebSocket (`connected/connecting`), latence visuelle via le point (vert/rouge).
-- Barre info CAN/DBC : source CAN, DBC chargé, compteurs RX et indicateur `stale`.
-- Onglets : `Debug` (payload complet), `Dev` (KPIs + dérivés), `Street`/`Race` (placeholders).
-- Debug :
-  - Filtre plein‑texte (ex: `RPM`, `MAP`, `0x280`) sur le payload.
-  - Flags (MIL/EPC/Fan/…).
-  - Table signals + âges (`age`) en secondes.
-- Dev :
-  - KPIs dérivés (fenêtre glissante 5s).
-  - Flags synthétiques.
+- Top bar: WebSocket status (`connected/connecting`), visual latency via the dot (green/red).
+- CAN/DBC info bar: CAN source, loaded DBC, RX counters, and `stale` indicator.
+- Tabs: `Debug` (full payload), `Dev` (KPIs + derived), `Street`/`Race` (placeholders).
+- Debug:
+  - Full-text filter (e.g. `RPM`, `MAP`, `0x280`) on the payload.
+  - Flags (MIL/EPC/Fan/...).
+  - Signals table + ages (`age`) in seconds.
+- Dev:
+  - Derived KPIs (5s rolling window).
+  - Synthetic flags.
 
 #### Snapshots (UI)
-Debug :
+Debug:
 ![Liveview Debug](docs/snapshots/liveview-debug.png)
 
-Dev :
+Dev:
 ![Liveview Dev](docs/snapshots/liveview-dev.png)
 
-#### Snapshots (extraits)
-Status line (barre info CAN/DBC) :
+#### Snapshots (snippets)
+Status line (CAN/DBC info bar):
 ```
 CAN:can0 | DBC:golf4_min.dbc | rx:115482/47736 | stale:yes
 ```
 
-Snapshot payload (extrait /metrics) :
+Snapshot payload (excerpt from /metrics):
 ```json
 {
   "meta": {
@@ -132,75 +133,90 @@ Snapshot payload (extrait /metrics) :
 }
 ```
 
-Lancer via systemd (recommandé)
+Run with systemd (recommended)
 TX service
 
-Service : can-tx.service
+Service: can-tx.service
 
-ExecStart doit être : uvicorn can_tx_emulator:app ...
+ExecStart must be: uvicorn can_tx_emulator:app ...
 
-WorkingDirectory : /home/olivier/ecu_emulator
+WorkingDirectory: /home/olivier/ecu_emulator
 
-Commandes :
+Commands:
 ```bash
 sudo systemctl enable --now can-tx.service
 systemctl status can-tx.service --no-pager
 journalctl -u can-tx.service -f
 ```
-RX service (si présent)
+
+RX service (if present)
 ```bash
 sudo systemctl enable --now liveview.service
 systemctl status liveview.service --no-pager
 journalctl -u liveview.service -f
 ```
+
 Configuration
 DBC
 
-dbc/golf4_min.dbc contient :
+Two DBCs are available:
+- `dbc/golf4_min.dbc` (minimal, 2 messages)
+- `dbc/golf4_ext.dbc` (extended, 8 messages)
 
-EngineFast (0x280): RPM, Throttle, Load, Speed, MAP_kPa
+`dbc/golf4_min.dbc` contains:
+- EngineFast (0x280): RPM, Throttle, Load, Speed, MAP_kPa
+- EngineStatus (0x288): CoolantTemp, OilTemp, BatteryV, Lambda, MIL, EPC, Fan, Cruise, BrakeSwitch, ClutchSwitch
 
-EngineStatus (0x288): CoolantTemp, OilTemp, BatteryV, Lambda, MIL, EPC, Fan, Cruise, BrakeSwitch, ClutchSwitch
+`dbc/golf4_ext.dbc` contains everything from the minimal DBC plus:
+- EngineSensors (0x290): IAT_C, AFR, FuelPressure_kPa, OilPressure_kPa, EGT_C
+- BoostControl (0x291): BoostTarget_kPa, BoostError_kPa, WGDC_pct, N75_pct, TurboSpeed_krpm
+- FuelIgnition (0x292): IgnAngle_deg, Dwell_ms, InjPW_ms, FuelTrimST_pct, FuelTrimLT_pct, LambdaTarget, FuelTemp_C
+- Ethanol (0x293): Ethanol_pct, StoichAFR, FlexFuelMode, FuelDensity
+- Knock (0x294): KnockRetard_deg, KnockCount, IATComp_pct, EGTAlarm, OilPressAlarm
+- DSG (0x2A0): Gear, ClutchSlip_rpm, TransTemp_C, Mode, ShiftRequest, LaunchActive, TCU_Ready
 
 frames.yaml
 
-frames.yaml pilote ce que le TX émet (période + mapping).
-Si le TX n’émet pas et que le service reste “running”, regarder :
+frames.yaml drives what TX emits (period + mapping).
+If TX does not emit and the service stays “running”, check:
 ```bash
 journalctl -u can-tx.service -n 200 --no-pager
 ```
-Troubleshooting
-candump ne montre rien
 
-vérifier can0 UP + bitrate :
+Troubleshooting
+candump shows nothing
+
+Check can0 UP + bitrate:
 ```bash
 ip -details link show can0
 ```
 
-vérifier que le TX tourne :
+Check that TX is running:
 ```bash
 systemctl status can-tx.service --no-pager
 ```
 
-vérifier erreurs d’encodage DBC (signals manquants, mauvais noms) :
+Check DBC encode errors (missing signals, wrong names):
 ```bash
 journalctl -u can-tx.service -n 200 --no-pager
 ```
-“address already in use”
 
-Changer le port ou arrêter le service qui occupe le port :
+"address already in use"
+
+Change the port or stop the service using it:
 ```bash
 sudo ss -ltnp 'sport = :8010'
 sudo systemctl stop liveview.service
 ```
+
 Backup GitHub
 
-Utiliser backup.sh (voir ci-dessous) :
+Use backup.sh (see below):
 ```bash
-./backup.sh "message optionnel"
+./backup.sh "optional message"
 ```
 
-Ou avec remote en argument :
+Or with a remote as argument:
 ```bash
 ./backup.sh "backup full" git@github.com:olivierbrager/golf4-can-bench.git
 ```
