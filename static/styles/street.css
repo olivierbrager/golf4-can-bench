@@ -1,64 +1,376 @@
 .street-card{overflow:visible}
-#audi-note{color:#fff}
-.audi-dash{
-  display:grid;
-  gap:16px;
+
+@font-face{
+  font-family: "AudiTypeExtendedBold";
+  src: url("/static/styles/AudiType-ExtendedBold_4.03.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
 }
-.audi-main{
+
+@font-face{
+  font-family: "AudiTypeScreen";
+  src: url("/static/styles/AudiTypeScreen-Normal.woff2") format("woff2");
+  font-display: swap;
+}
+
+@font-face{
+  font-family: "AudiTypeScreen";
+  src: url("/static/styles/AudiTypeScreen-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-display: swap;
+}
+
+@font-face{
+  font-family: "AudiTypeWide";
+  src: url("/static/styles/AudiType-WideNormal_4.03.woff2") format("woff2");
+  font-display: swap;
+}
+
+@font-face{
+  font-family: "AudiTypeWide";
+  src: url("/static/styles/AudiType-WideBold_4.03.woff2") format("woff2");
+  font-weight: 700;
+  font-display: swap;
+}
+
+.audi-classic{
+  --stroke: rgba(255,255,255,.14);
+  --dim: rgba(255,255,255,.6);
+  --soft: rgba(255,255,255,.85);
+  --red: #c01822;
+  --font: "AudiTypeExtendedBold", "AudiTypeScreen", "AudiTypeWide", "DIN Condensed", "Bahnschrift", "Teko", "Rajdhani", "Roboto Condensed", "Arial Narrow", sans-serif;
+  --tach-red-start: 85%;
+  --tick-step: 8.125deg;
+  --tick-major: 32.5deg;
+
+  padding:14px 16px;
+  border-radius:24px;
+  background:
+    radial-gradient(1200px 420px at 50% -20%, rgba(255,255,255,.08), transparent 60%),
+    radial-gradient(800px 380px at 80% 10%, rgba(255,255,255,.05), transparent 65%),
+    linear-gradient(180deg, #0d0f14, #050607);
+  border:1px solid rgba(255,255,255,.08);
+  box-shadow:
+    0 40px 90px rgba(0,0,0,.65),
+    inset 0 1px 0 rgba(255,255,255,.08),
+    inset 0 -40px 120px rgba(0,0,0,.7);
+  font-family: var(--font);
+}
+
+.audi-classic,
+.audi-classic *{
+  font-family: var(--font);
+}
+
+.top-bar{
+  display:flex;
+  justify-content:space-between;
+  color:var(--dim);
+  font-size:12px;
+  letter-spacing:.6px;
+  margin-bottom:8px;
+}
+
+.cluster{
   display:grid;
-  grid-template-columns: 1.2fr 1fr;
-  gap:18px;
+  grid-template-columns: 1fr 1.2fr 1fr;
+  gap:16px;
   align-items:center;
 }
-.speed-ring{
-  --p:0;
-  width:min(420px, 100%);
+
+.dial{
+  position:relative;
   aspect-ratio:1/1;
   border-radius:50%;
-  margin:auto;
   background:
-    radial-gradient(circle at 50% 50%, rgba(255,255,255,.04) 0 58%, transparent 59% 100%),
-    conic-gradient(from -120deg, rgba(255,255,255,.10) 0deg, rgba(255,255,255,.10) calc(var(--p) * 3.6deg), rgba(255,255,255,.02) calc(var(--p) * 3.6deg), rgba(255,255,255,.02) 360deg);
-  border:1px solid rgba(255,255,255,.12);
-  box-shadow: 0 15px 40px rgba(0,0,0,.35), inset 0 0 0 14px rgba(12,16,28,.7);
+    radial-gradient(circle at 50% 52%, rgba(16,18,24,.98) 0 52%, rgba(6,8,12,.99) 68%, rgba(3,4,6,1) 100%),
+    linear-gradient(180deg, rgba(255,255,255,.03), rgba(0,0,0,.45));
+  border:1px solid var(--stroke);
+  box-shadow:
+    inset 0 0 0 12px rgba(10,12,16,.85),
+    inset 0 0 30px rgba(0,0,0,.85),
+    0 20px 50px rgba(0,0,0,.6);
+}
+.dial-left{
+  font-family: var(--font);
+}
+.dial-ring{
+  position:absolute;
+  inset:4.6%;
+  border-radius:50%;
+  border:1px solid rgba(255,255,255,.15);
+  background:
+    radial-gradient(circle at 50% 18%, rgba(255,255,255,.04), rgba(255,255,255,0) 44%),
+    linear-gradient(180deg, rgba(26,30,36,.26), rgba(4,6,10,.94));
+  box-shadow: inset 0 0 16px rgba(0,0,0,.82), inset 0 0 0 1px rgba(255,255,255,.10), 0 0 8px rgba(255,255,255,.03);
+}
+.dial-left .dial-ring::after{
+  content:"";
+  position:absolute;
+  left:50%;
+  top:50%;
+  width:10px;
+  height:4px;
+  transform: translate(-50%, -50%) rotate(calc(135deg + (var(--p) * 2.7deg))) translateY(-44%);
+  border-radius:999px;
+  background: linear-gradient(180deg, rgba(255,255,255,.85), rgba(80,86,96,.45));
+  box-shadow: 0 0 6px rgba(255,255,255,.16);
+  pointer-events:none;
+}
+.dial-ring-outer{
+  position:absolute;
+  inset:.8%;
+  border-radius:50%;
+  background: linear-gradient(180deg, rgba(248,252,255,.48), rgba(20,24,30,.5));
+  mask: radial-gradient(circle at 50% 50%, transparent 97.2%, #000 97.5%, #000 98.9%, transparent 99.1%);
+  box-shadow: 0 0 8px rgba(255,255,255,.12);
+  pointer-events:none;
+}
+.dial-inner{
+  position:absolute;
+  inset:30%;
+  border-radius:50%;
   display:grid;
   place-items:center;
+  text-align:center;
+  background: radial-gradient(circle at 50% 35%, rgba(40,44,52,.45), rgba(8,10,14,.95) 72%);
+  border:1px solid rgba(255,255,255,.12);
+  box-shadow: inset 0 0 20px rgba(0,0,0,.8);
 }
-.speed-ring-inner{ text-align:center; }
-.speed-value{ font-size:86px; line-height:1; font-weight:900; letter-spacing:1px; }
-.speed-unit{ color:rgba(255,255,255,.64); font-weight:700; letter-spacing:1px; text-transform:uppercase; }
-.speed-age{ margin-top:6px; color:rgba(255,255,255,.45); font-family:var(--mono); font-size:12px; }
-
-.center-stack{
-  border:1px solid rgba(255,255,255,.10);
-  border-radius:18px;
-  padding:18px;
-  background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.02));
+.dial-inner::after{
+  content:"";
+  position:absolute;
+  top:-6px;
+  left:50%;
+  width:28px;
+  height:6px;
+  transform: translateX(-50%);
+  border-radius:0 0 8px 8px;
+  background: linear-gradient(180deg, rgba(255,255,255,.55), rgba(255,255,255,.05));
+  opacity:.6;
 }
-.center-title{ color:rgba(255,255,255,.58); letter-spacing:1.3px; font-size:11px; font-weight:900; }
-.rpm-value{ margin-top:8px; font-size:58px; font-weight:900; line-height:1; }
-.rpm-unit{ color:rgba(255,255,255,.55); font-weight:700; text-transform:uppercase; }
-.rpm-bar{ margin-top:14px; width:100%; height:10px; border-radius:999px; background:rgba(255,255,255,.12); overflow:hidden; }
-.rpm-bar span{ display:block; height:100%; border-radius:999px; background: linear-gradient(90deg, #b6bec8, #ffffff); }
-.rpm-age{ margin-top:8px; color:rgba(255,255,255,.45); font-family:var(--mono); font-size:12px; }
+.dial-big{
+  font-size:52px;
+  font-weight:700;
+  color:#fff;
+  text-shadow: 0 2px 12px rgba(0,0,0,.7);
+}
+.dial-gear{
+  font-size:56px;
+  letter-spacing:1px;
+  font-weight:700;
+  background: linear-gradient(180deg, #ffffff 0%, #eef2f8 46%, #c9d0da 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow:
+    0 1px 0 rgba(255,255,255,.18),
+    0 3px 6px rgba(0,0,0,.8),
+    0 10px 24px rgba(0,0,0,.45);
+}
+.dial-sub{
+  margin-top:6px;
+  font-size:10px;
+  color:var(--dim);
+  letter-spacing:.8px;
+}
+.dial-labels{
+  position:absolute;
+  inset:0;
+  font-size:26px;
+  color:#fff;
+  font-weight:700;
+  z-index:4;
+}
+.dial-labels .dial-num{
+  position:absolute;
+  transform: translate(-50%, -50%);
+  text-shadow:
+    0 1px 0 rgba(255,255,255,.14),
+    0 3px 10px rgba(0,0,0,.82),
+    0 0 6px rgba(0,0,0,.45);
+}
+.dial-labels .dial-num.red{
+  color: #df1d28;
+}
 
-.audi-kpis{
+.dial-scale{
+  position:absolute;
+  inset:10%;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  font-size:16px;
+  color:#fff;
+  font-weight:700;
+}
+.dial-scale span{
+  text-shadow: 0 2px 10px rgba(0,0,0,.7);
+}
+.right-scale{
+  transform: rotate(10deg);
+}
+.right-scale span{
+  transform: rotate(-10deg);
+}
+.dial-redline{
+  position:absolute;
+  inset:3.5%;
+  border-radius:50%;
+  background:
+    conic-gradient(from 135deg,
+      rgba(255,255,255,0) 0deg 169deg,
+      rgba(210,26,38,.96) 169deg 270deg,
+      rgba(255,255,255,0) 270deg 360deg);
+  mask: radial-gradient(circle at 50% 50%, transparent 91%, #000 92%, #000 95%, transparent 96%);
+  opacity:.9;
+  z-index:2;
+}
+.dial-ticks{
+  position:absolute;
+  inset:0;
+  z-index:3;
+  pointer-events:none;
+}
+.dial-tick{
+  position:absolute;
+  width: 2px;
+  border-radius:999px;
+  transform-origin: center center;
+  box-shadow: 0 0 4px rgba(255,255,255,.18);
+}
+.dial-tick.minor{
+  height: 4px;
+  width: 1px;
+  background: rgba(255,255,255,.55);
+}
+.dial-tick.major{
+  height: 7px;
+  width: 1.5px;
+  background: rgba(255,255,255,.92);
+}
+.dial-tick.red{
+  background: rgba(210,26,38,.95);
+}
+.dial-needle{
+  --p:0;
+  position:absolute;
+  inset:0;
+  z-index:5;
+  pointer-events:none;
+}
+.dial-needle-left{
+  transform: rotate(calc(135deg + (var(--p) * 2.7deg)));
+}
+.dial-needle-left .dial-needle-line{
+  left:50%;
+  top:50%;
+  width:22%;
+  height:3px;
+  transform: translate(86%, -50%);
+  background: linear-gradient(90deg, rgba(240,70,82,.86), rgba(220,26,38,.98));
+  clip-path: polygon(0 0, 88% 40%, 100% 50%, 88% 60%, 0 100%);
+}
+.dial-needle-left .dial-needle-hub{
+  width:4px;
+  height:4px;
+  left:50%;
+  top:50%;
+  transform: translate(82%, -50%);
+  border-radius:50%;
+  border:none;
+  background: rgba(220,26,38,.95);
+  box-shadow: 0 0 4px rgba(220,26,38,.55);
+}
+.dial-needle-right{
+  transform: rotate(calc(-120deg + (var(--p) * 2.6deg)));
+}
+.dial-needle-line{
+  position:absolute;
+  left:50%;
+  top:50%;
+  width:38%;
+  height:4px;
+  transform: translate(0, -50%);
+  transform-origin: left center;
+  background: linear-gradient(90deg, rgba(192,24,34,.55), rgba(192,24,34,.98));
+  border-radius:999px;
+  clip-path: polygon(0 50%, 94% 12%, 100% 50%, 94% 88%);
+  box-shadow: 0 0 10px rgba(192,24,34,.52);
+}
+.dial-needle-right .dial-needle-line{
+  width:34%;
+}
+.dial-needle-hub{
+  position:absolute;
+  left:50%;
+  top:50%;
+  width:10px;
+  height:10px;
+  transform: translate(-50%, -50%);
+  border-radius:50%;
+  background: radial-gradient(circle at 35% 35%, rgba(255,255,255,.92), rgba(30,32,36,.85) 65%);
+  border:1px solid rgba(255,255,255,.16);
+  box-shadow: 0 0 8px rgba(255,255,255,.2);
+}
+.dial-needle-right .dial-needle-hub{
+  display:none;
+}
+
+.center-panel{
+  aspect-ratio: 16 / 9;
+  border-radius:14px;
+  border:1px solid var(--stroke);
+  background:
+    radial-gradient(circle at 50% 35%, rgba(255,255,255,.07), rgba(0,0,0,.85) 70%),
+    linear-gradient(180deg, rgba(255,255,255,.04), rgba(0,0,0,.7));
+  box-shadow: inset 0 0 20px rgba(0,0,0,.8);
   display:grid;
-  grid-template-columns: repeat(5,minmax(0,1fr));
-  gap:10px;
-}
-.audi-kpi{
-  border:1px solid rgba(255,255,255,.10);
-  border-radius:12px;
+  place-items:center;
   padding:10px;
-  background: rgba(255,255,255,.03);
 }
-.audi-kpi div{ color:rgba(255,255,255,.56); font-size:12px; font-weight:800; letter-spacing:.3px; text-transform:uppercase; }
-.audi-kpi strong{ display:block; margin-top:5px; font-size:28px; line-height:1.1; }
-.audi-kpi small{ color:rgba(255,255,255,.45); font-family:var(--mono); }
+.center-top{
+  display:flex;
+  justify-content:space-between;
+  width:100%;
+  font-size:14px;
+  color:#fff;
+  font-weight:800;
+}
+.center-top .car{
+  color:var(--dim);
+  font-weight:600;
+}
+.center-icons{
+  display:flex;
+  gap:14px;
+  margin-top:10px;
+  color:var(--dim);
+  font-size:16px;
+}
+
+.bottom-bar{
+  margin-top:10px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  font-size:14px;
+  color:var(--soft);
+}
+.bottom-left,.bottom-right{
+  color:var(--dim);
+}
+.bottom-center{
+  font-weight:800;
+  letter-spacing:1px;
+}
+.sep{
+  margin:0 6px;
+  color:var(--dim);
+}
 
 @media (max-width: 1100px){
-  .audi-main{ grid-template-columns:1fr; }
-  .audi-kpis{ grid-template-columns: repeat(2,minmax(0,1fr)); }
-  .speed-value{ font-size:70px; }
+  .cluster{ grid-template-columns:1fr; }
+  .center-panel{ width:100%; }
 }
