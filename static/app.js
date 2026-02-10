@@ -1,6 +1,7 @@
 import { Core } from "./core.js";
 import { renderDebug } from "./views/debug.js";
 import { renderDev } from "./views/dev.js";
+import { renderStreet } from "./views/street.js";
 
 const $ = (s) => document.querySelector(s);
 const $$ = (s) => Array.from(document.querySelectorAll(s));
@@ -25,6 +26,7 @@ const core = new Core({
 core.onPayload((p) => {
   renderDebug(p);
   renderDev(p);
+  renderStreet(p);
 });
 
 core.connect();

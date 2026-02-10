@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="/static/styles/base.css">
   <link rel="stylesheet" href="/static/styles/dev.css">
   <link rel="stylesheet" href="/static/styles/debug.css?v=baseclean2">
+  <link rel="stylesheet" href="/static/styles/street.css?v=audi1">
 </head>
 <body>
   <div class="wrap">
@@ -68,8 +69,14 @@
     </div>
 
     <div class="view" id="view-street">
-      <div class="card"><div class="head"><h2>Street</h2><div class="meta">Désactivé pour l’instant.</div></div>
-        <div class="body"><div class="sub">On y revient après Dev/Debug.</div></div>
+      <div class="card street-card">
+        <div class="head">
+          <h2>Street</h2>
+          <div class="meta">Dashboard style Audi (mode route)</div>
+        </div>
+        <div class="body">
+          <div id="street-dashboard"></div>
+        </div>
       </div>
     </div>
 
