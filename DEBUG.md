@@ -27,6 +27,7 @@ Exemples d’événements:
 ## Métriques (mémoire, Debug uniquement)
 Les métriques sont maintenues en mémoire et exposées dans `GET /metrics` sous `debug_metrics`.
 En dehors du Debug, `debug_metrics` est absent pour minimiser l’overhead.
+Pour les activer, définir `DEBUG=1` (ou `true`/`yes`) avant de lancer l’app.
 
 - `rx_frames_total`
 - `rx_frames_per_sec` (moyenne glissante sur ~5s)

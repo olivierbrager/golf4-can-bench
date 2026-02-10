@@ -33,17 +33,17 @@ candump -L can0 -n 3
 
 ### 2) Python venv
 ```bash
-cd /home/olivier/ecu_emulator
+cd /opt/golf4-can-bench
 python -m venv .venv
 source .venv/bin/activate
 pip install -U pip
-pip install python-can cantools fastapi "uvicorn[standard]" pyyaml
+pip install -r requirements.txt
 ```
 
 Manual run (without systemd)
 TX (emulator)
 ```bash
-cd /home/olivier/ecu_emulator
+cd /opt/golf4-can-bench
 source .venv/bin/activate
 uvicorn can_tx_emulator:app --host 0.0.0.0 --port 8000
 ```
@@ -57,13 +57,26 @@ candump -L can0 -n 20
 
 Example (adjust variables if your liveview uses them):
 ```bash
-cd /home/olivier/ecu_emulator
+cd /opt/golf4-can-bench
 source .venv/bin/activate
 
 CAN_CH=can0 DBC_PATH=dbc/golf4_min.dbc PUSH_HZ=15 STALE_S=1.0 \
 SPEED_FACTOR=1.0 MAP_FACTOR=1.0 ATM_KPA=101.3 \
 python -m uvicorn liveview:app --host 0.0.0.0 --port 8010
 ```
+
+### Variables d’environnement (liveview)
+- `CAN_CH` (default `can0`)
+- `DBC_PATH` (default `dbc/golf4_min.dbc`)
+- `PUSH_HZ` (default `15`)
+- `STALE_S` (default `1.0`)
+- `SPEED_FACTOR` (default `1.0`)
+- `MAP_FACTOR` (default `1.0`)
+- `ATM_KPA` (default `101.3`)
+- `DEBUG` (voir `DEBUG.md`)
+
+### Configuration TX (can_tx_emulator)
+Le TX lit sa configuration dans `frames.yaml` (bus, DBC, messages, périodes, mapping signaux).
 
 ## UI
 
@@ -154,31 +167,42 @@ Snapshot payload (excerpt from /metrics):
 }
 ```
 
-Run with systemd (recommended)
-TX service
+## systemd (recommended)
 
-Service: can-tx.service
+Le repo fournit des exemples dans `systemd/`:
+- `systemd/can0.service`
+- `systemd/can0-watchdog.service` + `systemd/can0-watchdog.timer`
+- `systemd/liveview.service.example`
 
-ExecStart must be: uvicorn can_tx_emulator:app ...
+Installe les exemples (à adapter selon ton chemin de repo):
+```bash
+sudo cp systemd/can0.service /etc/systemd/system/
+sudo cp systemd/can0-watchdog.service /etc/systemd/system/
+sudo cp systemd/can0-watchdog.timer /etc/systemd/system/
+sudo cp systemd/liveview.service.example /etc/systemd/system/liveview.service
+sudo systemctl daemon-reload
+```
 
-WorkingDirectory: /home/olivier/ecu_emulator
+Le repo ne contient pas de `can-tx.service` prêt à l’emploi. Crée-en un similaire à `liveview.service` avec:
+- `ExecStart=uvicorn can_tx_emulator:app --host 0.0.0.0 --port 8000`
+- `WorkingDirectory=/opt/golf4-can-bench`
 
-Commands:
+Commandes:
 ```bash
 sudo systemctl enable --now can-tx.service
 systemctl status can-tx.service --no-pager
 journalctl -u can-tx.service -f
 ```
 
-RX service (if present)
+RX service
 ```bash
 sudo systemctl enable --now liveview.service
 systemctl status liveview.service --no-pager
 journalctl -u liveview.service -f
 ```
 
-Configuration
-DBC
+## Configuration
+### DBC
 
 Two DBCs are available:
 - `dbc/golf4_min.dbc` (minimal, 2 messages)
@@ -196,7 +220,7 @@ Two DBCs are available:
 - Knock (0x294): KnockRetard_deg, KnockCount, IATComp_pct, EGTAlarm, OilPressAlarm
 - DSG (0x2A0): Gear, ClutchSlip_rpm, TransTemp_C, Mode, ShiftRequest, LaunchActive, TCU_Ready
 
-frames.yaml
+### frames.yaml
 
 frames.yaml drives what TX emits (period + mapping).
 If TX does not emit and the service stays “running”, check:
@@ -204,8 +228,8 @@ If TX does not emit and the service stays “running”, check:
 journalctl -u can-tx.service -n 200 --no-pager
 ```
 
-Troubleshooting
-candump shows nothing
+## Troubleshooting
+### candump shows nothing
 
 Check can0 UP + bitrate:
 ```bash
@@ -222,7 +246,7 @@ Check DBC encode errors (missing signals, wrong names):
 journalctl -u can-tx.service -n 200 --no-pager
 ```
 
-"address already in use"
+### "address already in use"
 
 Change the port or stop the service using it:
 ```bash
@@ -230,7 +254,7 @@ sudo ss -ltnp 'sport = :8010'
 sudo systemctl stop liveview.service
 ```
 
-Backup GitHub
+## Backup GitHub
 
 Use backup.sh (see below):
 ```bash

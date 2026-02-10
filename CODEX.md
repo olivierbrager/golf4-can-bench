@@ -9,6 +9,7 @@ Invariants concrets:
 - Flux RX/WS stable (pas de crash, pas de reconnexion en boucle).
 - UI inchangée: pas de régression visuelle ou fonctionnelle.
 - DBC compatible: décodage stable, pas de champs cassés.
+- Doc cohérente avec le repo (`/opt/golf4-can-bench`, `requirements.txt`, services systemd).
 
 ## 3) Règles d’utilisation de Codex (strict)
 - Changements atomiques.
