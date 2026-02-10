@@ -17,6 +17,13 @@ Dernière mise à jour: 2026-02-10
 - Variables d’environnement liveview listées
 - Section systemd clarifiée (exemples `systemd/` + `can-tx.service` à créer)
 
+### UI Debug
+- Tableau en 2 colonnes: gauche = `Raw (DBC decode)`, droite = `Signals/Compat/Dev/Meta`
+- Suppression des sections repliables (pas de collapse)
+- Titres de catégories plus visibles (taille + gras + couleur claire)
+- Colonnes compactées (Age moins large)
+- Cache busting des assets (`debug.css` / `app.js`)
+
 ### Shell styling
 - Starship prompt personnalisé (Tokyo Night)
 - VS Code SSH / Codex ready
