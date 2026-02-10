@@ -1,4 +1,4 @@
-VERSION ""
+VERSION "golf4_ext"
 
 NS_ :
 	NS_DESC_
@@ -113,3 +113,22 @@ BO_ 672 DSG: 8 Vector__XXX
  SG_ ShiftRequest : 40|2@1+ (1,0) [0|3] "" Vector__XXX
  SG_ LaunchActive : 48|1@1+ (1,0) [0|1] "" Vector__XXX
  SG_ TCU_Ready : 49|1@1+ (1,0) [0|1] "" Vector__XXX
+
+VAL_ 648 MIL 0 "Off" 1 "On";
+VAL_ 648 EPC 0 "Off" 1 "On";
+VAL_ 648 Fan 0 "Off" 1 "On";
+VAL_ 648 Cruise 0 "Inactive" 1 "Active";
+VAL_ 648 BrakeSwitch 0 "Released" 1 "Pressed";
+VAL_ 648 ClutchSwitch 0 "Released" 1 "Pressed";
+
+VAL_ 659 FlexFuelMode 0 "Petrol" 1 "Blend" 2 "E85" 3 "Fallback";
+
+VAL_ 660 EGTAlarm 0 "Normal" 1 "Alarm";
+VAL_ 660 OilPressAlarm 0 "Normal" 1 "Alarm";
+
+VAL_ 672 Mode 0 "P" 1 "R" 2 "N" 3 "D" 4 "S" 5 "M" 6 "LaunchPrep" 7 "Fault";
+VAL_ 672 ShiftRequest 0 "None" 1 "Upshift" 2 "Downshift" 3 "Kickdown";
+VAL_ 672 LaunchActive 0 "No" 1 "Yes";
+VAL_ 672 TCU_Ready 0 "No" 1 "Yes";
+CM_ BO_ 640 "Fast engine telemetry (RPM/Throttle/Load/Speed/MAP)";
+CM_ BO_ 648 "Engine status, temperatures, lambda and binary flags";

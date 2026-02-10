@@ -90,7 +90,7 @@ Le TX lit sa configuration dans `frames.yaml` (bus, DBC, messages, périodes, ma
 #### Interface (Liveview)
 - Top bar: WebSocket status (`connected/connecting`), visual latency via the dot (green/red).
 - CAN/DBC info bar: CAN source, loaded DBC, RX counters, and `stale` indicator.
-- Tabs: `Debug` (full payload), `Dev` (KPIs + derived), `Street`/`Race` (placeholders).
+- Tabs: `Debug` (full payload), `Dev` (KPIs + derived), `Street` (dashboard Audi-style), `Race` (placeholder).
 - Debug:
   - Full-text filter (e.g. `RPM`, `MAP`, `0x280`) on the payload.
   - Flags (MIL/EPC/Fan/...).
@@ -98,6 +98,9 @@ Le TX lit sa configuration dans `frames.yaml` (bus, DBC, messages, périodes, ma
 - Dev:
   - Derived KPIs (5s rolling window).
   - Synthetic flags.
+- Street:
+  - Audi-style dashboard for road driving (speed ring, RPM bar, BOOST/LAMBDA/OIL/COOLANT/BATTERY cards).
+  - Uses compatibility aliases (`compat.signals`) to stay robust across DBC variants.
 
 #### Snapshots (UI)
 Debug:
@@ -105,6 +108,7 @@ Debug:
 
 Dev:
 ![Liveview Dev](docs/snapshots/liveview-dev.png)
+
 
 #### Snapshots (snippets)
 Status line (CAN/DBC info bar):
