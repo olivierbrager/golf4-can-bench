@@ -96,8 +96,8 @@ export function renderDebug(payload){
     }).join("");
 
     const n = entries.length;
-    return `<details open class="dbg-section">
-      <summary class="kbd">${title} <span class="kbd" style="opacity:.7">(${n})</span></summary>
+    return `<section class="dbg-section">
+      <div class="dbg-section-head kbd">${title} <span class="kbd" style="opacity:.7">(${n})</span></div>
       <div class="dbg-section-body">
         <table class="debug-table">
           <colgroup>
@@ -112,7 +112,7 @@ export function renderDebug(payload){
           <tbody>${rows || `<tr><td colspan="4" class="kbd">—</td></tr>`}</tbody>
         </table>
       </div>
-    </details>`;
+    </section>`;
   };
 
   const tableKV = (title, obj) => {
@@ -128,8 +128,8 @@ export function renderDebug(payload){
     }).join("");
 
     const n = entries.length;
-    return `<details class="dbg-section">
-      <summary class="kbd">${title} <span class="kbd" style="opacity:.7">(${n})</span></summary>
+    return `<section class="dbg-section">
+      <div class="dbg-section-head kbd">${title} <span class="kbd" style="opacity:.7">(${n})</span></div>
       <div class="dbg-section-body">
         <table class="debug-table">
           <colgroup>
@@ -144,7 +144,7 @@ export function renderDebug(payload){
           <tbody>${rows || `<tr><td colspan="4" class="kbd">—</td></tr>`}</tbody>
         </table>
       </div>
-    </details>`;
+    </section>`;
   };
 
   // Sections
@@ -165,17 +165,22 @@ export function renderDebug(payload){
     dbc: meta.dbc,
   };
 
-  const html = [
-    tableSignals("Signals (canonical)", sig),
+  const leftCol = [
     tableSignals("Raw (DBC decode)", raw),
+  ].join("");
+
+  const rightCol = [
+    tableSignals("Signals (canonical)", sig),
     tableSignals("Compat (legacy aliases)", compat),
     tableKV("Dev (derived KPIs)", dev),
     tableKV("Meta (RX/health)", metaCopy),
   ].join("");
+
+  const html = `<div class="dbg-col dbg-col-left">${leftCol}</div>
+    <div class="dbg-col dbg-col-right">${rightCol}</div>`;
 
   const tableEl = $("#dbg-table");
   if(tableEl){
     tableEl.innerHTML = html;
   }
 }
-

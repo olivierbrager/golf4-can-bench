@@ -7,6 +7,33 @@
    Applies only inside #dbg-table
    ========================================================= */
 
+#dbg-table{
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+#dbg-table .dbg-col{
+  display: grid;
+  gap: 12px;
+}
+
+#dbg-table .dbg-section{
+  margin: 0;
+}
+
+#dbg-table .dbg-section-head{
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--text);
+  padding: 4px 0 8px 0;
+  letter-spacing: .2px;
+}
+
+#dbg-table .dbg-section-body{
+  margin-top: 8px;
+}
+
 #dbg-table table{
   table-layout: fixed;
   width: 100%;
@@ -25,10 +52,10 @@
 }
 
 /* Fixed column widths (stable layout) */
-#dbg-table col.col-signal { width: 36%; }
-#dbg-table col.col-value  { width: 22%; }
-#dbg-table col.col-unit   { width: 16%; }
-#dbg-table col.col-age    { width: 26%; }
+#dbg-table col.col-signal { width: 44%; }
+#dbg-table col.col-value  { width: 24%; }
+#dbg-table col.col-unit   { width: 12%; }
+#dbg-table col.col-age    { width: 20%; }
 
 #dbg-table td.right{
   text-align: right;
@@ -38,7 +65,7 @@
 /* Value badges (scoped, doesn't affect other .ok/.warn/.bad uses) */
 #dbg-table .val-badge{
   display: inline-block;
-  min-width: 72px;
+  min-width: 64px;
   text-align: right;
   padding: 3px 8px;
   border-radius: 999px;
@@ -81,5 +108,11 @@
 
 #dbg-table .val-badge{
   text-align: center;
-  min-width: 84px;
+  min-width: 72px;
+}
+
+@media (max-width: 1100px){
+  #dbg-table{
+    grid-template-columns: 1fr;
+  }
 }
