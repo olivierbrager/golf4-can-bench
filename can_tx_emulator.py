@@ -1115,6 +1115,197 @@ INDEX_HTML = r"""<!doctype html>
             <div class="value"><span id="dtcVal">0</span></div>
           </div>
 
+          <div style="margin-top:14px;margin-bottom:8px;font-size:12px;color:var(--muted);font-weight:800;letter-spacing:.2px;">
+            Extended DBC
+          </div>
+
+          <div class="row">
+            <div class="label"><strong>AFR</strong><span>Air fuel ratio</span></div>
+            <input id="afr" type="range" min="0" max="25.5" step="0.1" value="14.7">
+            <div class="value"><span id="afrVal">14.7</span></div>
+          </div>
+
+          <div class="row">
+            <div class="label"><strong>Fuel Pressure</strong><span>Rail pressure</span></div>
+            <input id="fuel_pressure_kpa" type="range" min="0" max="2000" step="1" value="400">
+            <div class="value"><span id="fuelPressureVal">400</span> <small>kPa</small></div>
+          </div>
+
+          <div class="row">
+            <div class="label"><strong>Oil Pressure</strong><span>Lub pressure</span></div>
+            <input id="oil_pressure_kpa" type="range" min="0" max="2000" step="1" value="250">
+            <div class="value"><span id="oilPressureVal">250</span> <small>kPa</small></div>
+          </div>
+
+          <div class="row">
+            <div class="label"><strong>EGT</strong><span>Exhaust gas temp</span></div>
+            <input id="egt_c" type="range" min="0" max="1200" step="1" value="650">
+            <div class="value"><span id="egtVal">650</span> <small>°C</small></div>
+          </div>
+
+          <div class="row">
+            <div class="label"><strong>Boost Target</strong><span>Target pressure</span></div>
+            <input id="boost_target_kpa" type="range" min="0" max="300" step="0.1" value="180">
+            <div class="value"><span id="boostTargetVal">180.0</span> <small>kPa</small></div>
+          </div>
+
+          <div class="row">
+            <div class="label"><strong>Boost Error</strong><span>Target - MAP</span></div>
+            <input id="boost_error_kpa" type="range" min="-300" max="300" step="0.1" value="0">
+            <div class="value"><span id="boostErrorVal">0.0</span> <small>kPa</small></div>
+          </div>
+
+          <div class="row">
+            <div class="label"><strong>WGDC</strong><span>Wastegate duty</span></div>
+            <input id="wgdc_pct" type="range" min="0" max="100" step="0.5" value="35">
+            <div class="value"><span id="wgdcVal">35.0</span> <small>%</small></div>
+          </div>
+
+          <div class="row">
+            <div class="label"><strong>N75</strong><span>Valve duty</span></div>
+            <input id="n75_pct" type="range" min="0" max="100" step="0.5" value="35">
+            <div class="value"><span id="n75Val">35.0</span> <small>%</small></div>
+          </div>
+
+          <div class="row">
+            <div class="label"><strong>Turbo speed</strong><span>Compressor speed</span></div>
+            <input id="turbo_speed_krpm" type="range" min="0" max="400" step="0.1" value="80">
+            <div class="value"><span id="turboSpeedVal">80.0</span> <small>krpm</small></div>
+          </div>
+
+          <div class="row">
+            <div class="label"><strong>Ignition angle</strong><span>Timing advance</span></div>
+            <input id="ign_angle_deg" type="range" min="-30" max="60" step="0.1" value="10">
+            <div class="value"><span id="ignAngleVal">10.0</span> <small>deg</small></div>
+          </div>
+
+          <div class="row">
+            <div class="label"><strong>Dwell</strong><span>Coil charge time</span></div>
+            <input id="dwell_ms" type="range" min="0" max="12.75" step="0.05" value="2.5">
+            <div class="value"><span id="dwellVal">2.50</span> <small>ms</small></div>
+          </div>
+
+          <div class="row">
+            <div class="label"><strong>Injector PW</strong><span>Pulse width</span></div>
+            <input id="inj_pw_ms" type="range" min="0" max="12.75" step="0.05" value="3.0">
+            <div class="value"><span id="injPwVal">3.00</span> <small>ms</small></div>
+          </div>
+
+          <div class="row">
+            <div class="label"><strong>Fuel trim ST</strong><span>Short term</span></div>
+            <input id="fuel_trim_st" type="range" min="-100" max="100" step="0.5" value="0">
+            <div class="value"><span id="fuelTrimStVal">0.0</span> <small>%</small></div>
+          </div>
+
+          <div class="row">
+            <div class="label"><strong>Fuel trim LT</strong><span>Long term</span></div>
+            <input id="fuel_trim_lt" type="range" min="-100" max="100" step="0.5" value="0">
+            <div class="value"><span id="fuelTrimLtVal">0.0</span> <small>%</small></div>
+          </div>
+
+          <div class="row">
+            <div class="label"><strong>Lambda target</strong><span>Requested lambda</span></div>
+            <input id="lambda_target" type="range" min="0" max="2.55" step="0.01" value="1.00">
+            <div class="value"><span id="lambdaTargetVal">1.00</span></div>
+          </div>
+
+          <div class="row">
+            <div class="label"><strong>Fuel temp</strong><span>Fuel temperature</span></div>
+            <input id="fuel_temp_c" type="range" min="-40" max="215" step="1" value="25">
+            <div class="value"><span id="fuelTempVal">25</span> <small>°C</small></div>
+          </div>
+
+          <div class="row">
+            <div class="label"><strong>Ethanol</strong><span>Fuel blend content</span></div>
+            <input id="ethanol_pct" type="range" min="0" max="100" step="0.5" value="0">
+            <div class="value"><span id="ethanolVal">0.0</span> <small>%</small></div>
+          </div>
+
+          <div class="row">
+            <div class="label"><strong>Stoich AFR</strong><span>Blend stoich value</span></div>
+            <input id="stoich_afr" type="range" min="8" max="20" step="0.1" value="14.7">
+            <div class="value"><span id="stoichAfrVal">14.7</span></div>
+          </div>
+
+          <div class="row">
+            <div class="label"><strong>Flex mode</strong><span>0=Petrol,1=Blend,2=E85</span></div>
+            <input id="flex_mode" type="range" min="0" max="3" step="1" value="0">
+            <div class="value"><span id="flexModeVal">0</span></div>
+          </div>
+
+          <div class="row">
+            <div class="label"><strong>Fuel density</strong><span>Relative density</span></div>
+            <input id="fuel_density" type="range" min="0" max="25.5" step="0.1" value="7.4">
+            <div class="value"><span id="fuelDensityVal">7.4</span></div>
+          </div>
+
+          <div class="row">
+            <div class="label"><strong>Knock retard</strong><span>Timing correction</span></div>
+            <input id="knock_retard_deg" type="range" min="0" max="20" step="0.1" value="0">
+            <div class="value"><span id="knockRetardVal">0.0</span> <small>deg</small></div>
+          </div>
+
+          <div class="row">
+            <div class="label"><strong>Knock count</strong><span>Accumulated events</span></div>
+            <input id="knock_count" type="range" min="0" max="65535" step="1" value="0">
+            <div class="value"><span id="knockCountVal">0</span></div>
+          </div>
+
+          <div class="row">
+            <div class="label"><strong>IAT compensation</strong><span>Temp correction</span></div>
+            <input id="iat_comp_pct" type="range" min="-50" max="50" step="0.5" value="0">
+            <div class="value"><span id="iatCompVal">0.0</span> <small>%</small></div>
+          </div>
+
+          <div class="row">
+            <div class="label"><strong>DSG gear</strong><span>Transmission gear</span></div>
+            <input id="dsg_gear" type="range" min="0" max="10" step="1" value="1">
+            <div class="value"><span id="dsgGearVal">1</span></div>
+          </div>
+
+          <div class="row">
+            <div class="label"><strong>DSG slip</strong><span>Clutch slip</span></div>
+            <input id="dsg_clutch_slip_rpm" type="range" min="0" max="5000" step="1" value="0">
+            <div class="value"><span id="dsgSlipVal">0</span> <small>rpm</small></div>
+          </div>
+
+          <div class="row">
+            <div class="label"><strong>DSG trans temp</strong><span>Oil temperature</span></div>
+            <input id="dsg_trans_temp_c" type="range" min="-40" max="215" step="1" value="60">
+            <div class="value"><span id="dsgTempVal">60</span> <small>°C</small></div>
+          </div>
+
+          <div class="row">
+            <div class="label"><strong>DSG mode</strong><span>0..7</span></div>
+            <input id="dsg_mode" type="range" min="0" max="7" step="1" value="1">
+            <div class="value"><span id="dsgModeVal">1</span></div>
+          </div>
+
+          <div class="row">
+            <div class="label"><strong>Shift request</strong><span>0 none, 1 up, 2 down</span></div>
+            <input id="dsg_shift_request" type="range" min="0" max="3" step="1" value="0">
+            <div class="value"><span id="dsgShiftReqVal">0</span></div>
+          </div>
+
+          <div class="toggles" style="margin-top:12px;">
+            <div class="toggle">
+              <div class="tlabel"><strong>EGT alarm</strong><span>Thermal protection</span></div>
+              <label class="switch"><input id="egt_alarm" type="checkbox"><span class="slider"></span></label>
+            </div>
+            <div class="toggle">
+              <div class="tlabel"><strong>Oil pressure alarm</strong><span>Lubrication warning</span></div>
+              <label class="switch"><input id="oil_press_alarm" type="checkbox"><span class="slider"></span></label>
+            </div>
+            <div class="toggle">
+              <div class="tlabel"><strong>Launch active</strong><span>Launch control state</span></div>
+              <label class="switch"><input id="launch_active" type="checkbox"><span class="slider"></span></label>
+            </div>
+            <div class="toggle">
+              <div class="tlabel"><strong>TCU ready</strong><span>Transmission available</span></div>
+              <label class="switch"><input id="tcu_ready" type="checkbox"><span class="slider"></span></label>
+            </div>
+          </div>
+
           <div style="margin-top:12px;color:rgba(255,255,255,.55);font-size:12px;">
             DBC: <code id="dbcPath">__DBC_PATH__</code>
           </div>
@@ -1197,6 +1388,34 @@ INDEX_HTML = r"""<!doctype html>
   const boost_pressure = bindRange("boost_pressure", "boostVal", "boost_pressure", true, 0);
   const map_kpa = bindRange("map_kpa", "mapVal", "map_kpa", true, 0);
   const dtc_count = bindRange("dtc_count", "dtcVal", "dtc_count", false, 0);
+  const afr = bindRange("afr", "afrVal", "afr", true, 1);
+  const fuel_pressure_kpa = bindRange("fuel_pressure_kpa", "fuelPressureVal", "fuel_pressure_kpa", true, 0);
+  const oil_pressure_kpa = bindRange("oil_pressure_kpa", "oilPressureVal", "oil_pressure_kpa", true, 0);
+  const egt_c = bindRange("egt_c", "egtVal", "egt_c", true, 0);
+  const boost_target_kpa = bindRange("boost_target_kpa", "boostTargetVal", "boost_target_kpa", true, 1);
+  const boost_error_kpa = bindRange("boost_error_kpa", "boostErrorVal", "boost_error_kpa", true, 1);
+  const wgdc_pct = bindRange("wgdc_pct", "wgdcVal", "wgdc_pct", true, 1);
+  const n75_pct = bindRange("n75_pct", "n75Val", "n75_pct", true, 1);
+  const turbo_speed_krpm = bindRange("turbo_speed_krpm", "turboSpeedVal", "turbo_speed_krpm", true, 1);
+  const ign_angle_deg = bindRange("ign_angle_deg", "ignAngleVal", "ign_angle_deg", true, 1);
+  const dwell_ms = bindRange("dwell_ms", "dwellVal", "dwell_ms", true, 2);
+  const inj_pw_ms = bindRange("inj_pw_ms", "injPwVal", "inj_pw_ms", true, 2);
+  const fuel_trim_st = bindRange("fuel_trim_st", "fuelTrimStVal", "fuel_trim_st", true, 1);
+  const fuel_trim_lt = bindRange("fuel_trim_lt", "fuelTrimLtVal", "fuel_trim_lt", true, 1);
+  const lambda_target = bindRange("lambda_target", "lambdaTargetVal", "lambda_target", true, 2);
+  const fuel_temp_c = bindRange("fuel_temp_c", "fuelTempVal", "fuel_temp_c", true, 0);
+  const ethanol_pct = bindRange("ethanol_pct", "ethanolVal", "ethanol_pct", true, 1);
+  const stoich_afr = bindRange("stoich_afr", "stoichAfrVal", "stoich_afr", true, 1);
+  const flex_mode = bindRange("flex_mode", "flexModeVal", "flex_mode", false, 0);
+  const fuel_density = bindRange("fuel_density", "fuelDensityVal", "fuel_density", true, 1);
+  const knock_retard_deg = bindRange("knock_retard_deg", "knockRetardVal", "knock_retard_deg", true, 1);
+  const knock_count = bindRange("knock_count", "knockCountVal", "knock_count", false, 0);
+  const iat_comp_pct = bindRange("iat_comp_pct", "iatCompVal", "iat_comp_pct", true, 1);
+  const dsg_gear = bindRange("dsg_gear", "dsgGearVal", "dsg_gear", false, 0);
+  const dsg_clutch_slip_rpm = bindRange("dsg_clutch_slip_rpm", "dsgSlipVal", "dsg_clutch_slip_rpm", false, 0);
+  const dsg_trans_temp_c = bindRange("dsg_trans_temp_c", "dsgTempVal", "dsg_trans_temp_c", true, 0);
+  const dsg_mode = bindRange("dsg_mode", "dsgModeVal", "dsg_mode", false, 0);
+  const dsg_shift_request = bindRange("dsg_shift_request", "dsgShiftReqVal", "dsg_shift_request", false, 0);
 
   const brake_switch = bindSwitch("brake_switch", "brake_switch");
   const clutch_switch = bindSwitch("clutch_switch", "clutch_switch");
@@ -1204,6 +1423,10 @@ INDEX_HTML = r"""<!doctype html>
   const epc = bindSwitch("epc", "epc");
   const cruise_active = bindSwitch("cruise_active", "cruise_active");
   const fan_request = bindSwitch("fan_request", "fan_request");
+  const egt_alarm = bindSwitch("egt_alarm", "egt_alarm");
+  const oil_press_alarm = bindSwitch("oil_press_alarm", "oil_press_alarm");
+  const launch_active = bindSwitch("launch_active", "launch_active");
+  const tcu_ready = bindSwitch("tcu_ready", "tcu_ready");
 
   toggleEngine.addEventListener("click", () => {
     setEngine(!engine_on);
@@ -1235,6 +1458,34 @@ INDEX_HTML = r"""<!doctype html>
     indicated_torque.value = s.indicated_torque; document.getElementById("tqIndVal").textContent = Number(s.indicated_torque).toFixed(1);
     boost_pressure.value = s.boost_pressure; document.getElementById("boostVal").textContent = Number(s.boost_pressure).toFixed(0);
     map_kpa.value = s.map_kpa; document.getElementById("mapVal").textContent = Number(s.map_kpa).toFixed(0);
+    afr.value = s.afr; document.getElementById("afrVal").textContent = Number(s.afr).toFixed(1);
+    fuel_pressure_kpa.value = s.fuel_pressure_kpa; document.getElementById("fuelPressureVal").textContent = Number(s.fuel_pressure_kpa).toFixed(0);
+    oil_pressure_kpa.value = s.oil_pressure_kpa; document.getElementById("oilPressureVal").textContent = Number(s.oil_pressure_kpa).toFixed(0);
+    egt_c.value = s.egt_c; document.getElementById("egtVal").textContent = Number(s.egt_c).toFixed(0);
+    boost_target_kpa.value = s.boost_target_kpa; document.getElementById("boostTargetVal").textContent = Number(s.boost_target_kpa).toFixed(1);
+    boost_error_kpa.value = s.boost_error_kpa; document.getElementById("boostErrorVal").textContent = Number(s.boost_error_kpa).toFixed(1);
+    wgdc_pct.value = s.wgdc_pct; document.getElementById("wgdcVal").textContent = Number(s.wgdc_pct).toFixed(1);
+    n75_pct.value = s.n75_pct; document.getElementById("n75Val").textContent = Number(s.n75_pct).toFixed(1);
+    turbo_speed_krpm.value = s.turbo_speed_krpm; document.getElementById("turboSpeedVal").textContent = Number(s.turbo_speed_krpm).toFixed(1);
+    ign_angle_deg.value = s.ign_angle_deg; document.getElementById("ignAngleVal").textContent = Number(s.ign_angle_deg).toFixed(1);
+    dwell_ms.value = s.dwell_ms; document.getElementById("dwellVal").textContent = Number(s.dwell_ms).toFixed(2);
+    inj_pw_ms.value = s.inj_pw_ms; document.getElementById("injPwVal").textContent = Number(s.inj_pw_ms).toFixed(2);
+    fuel_trim_st.value = s.fuel_trim_st; document.getElementById("fuelTrimStVal").textContent = Number(s.fuel_trim_st).toFixed(1);
+    fuel_trim_lt.value = s.fuel_trim_lt; document.getElementById("fuelTrimLtVal").textContent = Number(s.fuel_trim_lt).toFixed(1);
+    lambda_target.value = s.lambda_target; document.getElementById("lambdaTargetVal").textContent = Number(s.lambda_target).toFixed(2);
+    fuel_temp_c.value = s.fuel_temp_c; document.getElementById("fuelTempVal").textContent = Number(s.fuel_temp_c).toFixed(0);
+    ethanol_pct.value = s.ethanol_pct; document.getElementById("ethanolVal").textContent = Number(s.ethanol_pct).toFixed(1);
+    stoich_afr.value = s.stoich_afr; document.getElementById("stoichAfrVal").textContent = Number(s.stoich_afr).toFixed(1);
+    flex_mode.value = s.flex_mode; document.getElementById("flexModeVal").textContent = Number(s.flex_mode).toFixed(0);
+    fuel_density.value = s.fuel_density; document.getElementById("fuelDensityVal").textContent = Number(s.fuel_density).toFixed(1);
+    knock_retard_deg.value = s.knock_retard_deg; document.getElementById("knockRetardVal").textContent = Number(s.knock_retard_deg).toFixed(1);
+    knock_count.value = s.knock_count; document.getElementById("knockCountVal").textContent = Number(s.knock_count).toFixed(0);
+    iat_comp_pct.value = s.iat_comp_pct; document.getElementById("iatCompVal").textContent = Number(s.iat_comp_pct).toFixed(1);
+    dsg_gear.value = s.dsg_gear; document.getElementById("dsgGearVal").textContent = Number(s.dsg_gear).toFixed(0);
+    dsg_clutch_slip_rpm.value = s.dsg_clutch_slip_rpm; document.getElementById("dsgSlipVal").textContent = Number(s.dsg_clutch_slip_rpm).toFixed(0);
+    dsg_trans_temp_c.value = s.dsg_trans_temp_c; document.getElementById("dsgTempVal").textContent = Number(s.dsg_trans_temp_c).toFixed(0);
+    dsg_mode.value = s.dsg_mode; document.getElementById("dsgModeVal").textContent = Number(s.dsg_mode).toFixed(0);
+    dsg_shift_request.value = s.dsg_shift_request; document.getElementById("dsgShiftReqVal").textContent = Number(s.dsg_shift_request).toFixed(0);
 
     dtc_count.value = s.dtc_count; document.getElementById("dtcVal").textContent = s.dtc_count;
 
@@ -1244,6 +1495,10 @@ INDEX_HTML = r"""<!doctype html>
     epc.checked = !!s.epc;
     cruise_active.checked = !!s.cruise_active;
     fan_request.checked = !!s.fan_request;
+    egt_alarm.checked = !!s.egt_alarm;
+    oil_press_alarm.checked = !!s.oil_press_alarm;
+    launch_active.checked = !!s.launch_active;
+    tcu_ready.checked = !!s.tcu_ready;
   };
 </script>
 </body>
