@@ -106,6 +106,7 @@
     radial-gradient(circle at 50% 18%, rgba(255,255,255,.04), rgba(255,255,255,0) 44%),
     linear-gradient(180deg, rgba(26,30,36,.26), rgba(4,6,10,.94));
   box-shadow: inset 0 0 16px rgba(0,0,0,.82), inset 0 0 0 1px rgba(255,255,255,.10), 0 0 8px rgba(255,255,255,.03);
+  filter: blur(.25px);
 }
 .dial-left .dial-ring::after{
   content:none;
@@ -122,18 +123,24 @@
     inset 0 -1px 0 rgba(20,24,30,.72),
     0 0 8px rgba(255,255,255,.16);
   pointer-events:none;
+  filter: blur(.2px);
 }
 .dial-inner{
   position:absolute;
   z-index:3;
-  inset:30%;
+  inset:25%;
   border-radius:50%;
+  overflow:hidden;
   display:grid;
   place-items:center;
   text-align:center;
-  background: radial-gradient(circle at 50% 35%, rgba(40,44,52,.45), rgba(8,10,14,.95) 72%);
+  background: radial-gradient(circle at 50% 38%, rgba(182,194,214,.16) 0%, rgba(72,84,102,.10) 34%, rgba(10,12,16,.94) 74%);
   border:6px solid rgba(176,184,196,.56);
-  box-shadow: inset 0 0 20px rgba(0,0,0,.8);
+  box-shadow: inset 0 0 30px rgba(0,0,0,.82);
+}
+.dial-inner > *{
+  position:relative;
+  z-index:1;
 }
 .dial-inner::after{
   content:none;
@@ -146,16 +153,16 @@
 }
 .dial-gear{
   font-size:56px;
-  letter-spacing:1px;
+  letter-spacing:.4px;
   font-weight:700;
-  background: linear-gradient(180deg, #ffffff 0%, #eef2f8 46%, #c9d0da 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  font-family: "AudiTypeScreen", "AudiTypeExtendedBold", "AudiTypeWide", sans-serif;
+  color: #e8edf5;
+  -webkit-text-stroke: .9px rgba(16,22,30,.78);
   text-shadow:
-    0 1px 0 rgba(255,255,255,.18),
-    0 3px 6px rgba(0,0,0,.8),
-    0 10px 24px rgba(0,0,0,.45);
+    0 -1px 0 rgba(255,255,255,.28),
+    0 1px 0 rgba(16,22,30,.72),
+    0 2px 4px rgba(0,0,0,.68),
+    0 4px 8px rgba(0,0,0,.48);
 }
 .dial-sub{
   margin-top:6px;
@@ -181,6 +188,15 @@
 }
 .dial-labels .dial-num.red{
   color: #df1d28;
+}
+.right-labels{
+  font-size:18px;
+  font-weight:700;
+}
+.right-labels .dial-num{
+  text-shadow:
+    0 1px 0 rgba(255,255,255,.10),
+    0 2px 8px rgba(0,0,0,.78);
 }
 
 .dial-scale{
@@ -220,6 +236,7 @@
   inset:0;
   z-index:4;
   pointer-events:none;
+  filter: blur(.2px);
 }
 .dial-tick{
   position:absolute;
@@ -248,6 +265,11 @@
   z-index:12;
   pointer-events:none;
 }
+.dial-needle-shadow{
+  z-index:10;
+  opacity:.64;
+  filter: blur(1.9px);
+}
 .dial-needle-left{
   transform: rotate(calc(135deg + (var(--p) * 2.7deg)));
 }
@@ -256,7 +278,7 @@
   top:50%;
   width:24%;
   height:5px;
-  transform: translate(98%, -50%);
+  transform: translate(112%, -50%);
   background: linear-gradient(90deg, rgba(240,70,82,.86), rgba(220,26,38,.98));
   clip-path: polygon(0 0, 100% 50%, 0 100%);
 }
@@ -264,7 +286,7 @@
   display:none;
 }
 .dial-needle-right{
-  transform: rotate(calc(-120deg + (var(--p) * 2.6deg)));
+  transform: rotate(calc(135deg + (var(--p) * 2.7deg)));
 }
 .dial-needle-line{
   position:absolute;
@@ -279,7 +301,18 @@
   box-shadow: 0 0 10px rgba(192,24,34,.52);
 }
 .dial-needle-right .dial-needle-line{
-  width:34%;
+  width:24%;
+  height:5px;
+  transform: translate(112%, -50%);
+  background: linear-gradient(90deg, rgba(240,70,82,.86), rgba(220,26,38,.98));
+  clip-path: polygon(0 0, 100% 50%, 0 100%);
+  border-radius:0;
+}
+.dial-needle-shadow .dial-needle-line{
+  background: linear-gradient(90deg, rgba(192,198,210,.42), rgba(124,132,146,.46));
+  box-shadow:
+    0 0 10px rgba(200,208,222,.30),
+    0 0 18px rgba(180,188,204,.20);
 }
 .dial-needle-hub{
   position:absolute;
