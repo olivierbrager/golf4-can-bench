@@ -3,8 +3,8 @@
 ## Activer le mode Debug
 Définir la variable d’environnement `DEBUG=1` (ou `true`/`yes`).
 Exemples:
-- `DEBUG=1 python -m uvicorn liveview:app --host 0.0.0.0 --port 8010`
-- `DEBUG=1 uvicorn can_tx_emulator:app --host 0.0.0.0 --port 8000`
+- `DEBUG=1 python -m uvicorn liveview:app --host 0.0.0.0 --port 8011`
+- `DEBUG=1 uvicorn can_tx_emulator:app --host 0.0.0.0 --port 8001`
 
 Si `DEBUG` est absent ou à `0`, les métriques sont désactivées et les logs sont minimisés.
 

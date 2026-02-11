@@ -25,6 +25,9 @@ Dernière mise à jour: 2026-02-11
 ### Documentation
 - Création de la spec dédiée Street: `docs/street-counters-spec.md`.
 - README enrichi avec le lien vers la spec Street.
+- Ports runtime/documentation harmonisés:
+  - Emulator TX: `8001`
+  - Liveview RX: `8011`
 
 ## 2026-02-10
 

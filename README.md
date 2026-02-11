@@ -45,7 +45,7 @@ TX (emulator)
 ```bash
 cd /opt/golf4-can-bench
 source .venv/bin/activate
-uvicorn can_tx_emulator:app --host 0.0.0.0 --port 8000
+uvicorn can_tx_emulator:app --host 0.0.0.0 --port 8001
 ```
 
 Verify that it is transmitting:
@@ -62,7 +62,7 @@ source .venv/bin/activate
 
 CAN_CH=can0 DBC_PATH=dbc/golf4_min.dbc PUSH_HZ=15 STALE_S=1.0 \
 SPEED_FACTOR=1.0 MAP_FACTOR=1.0 ATM_KPA=101.3 \
-python -m uvicorn liveview:app --host 0.0.0.0 --port 8010
+python -m uvicorn liveview:app --host 0.0.0.0 --port 8011
 ```
 
 ### Variables d’environnement (liveview)
@@ -80,12 +80,12 @@ Le TX lit sa configuration dans `frames.yaml` (bus, DBC, messages, périodes, ma
 
 ## UI
 
-### TX UI (if enabled in can_tx_emulator): http://<ip>:8000
+### TX UI (if enabled in can_tx_emulator): http://<ip>:8001
 
 #### Snapshot (ECU Emulator)
 ![ECU Emulator](docs/snapshots/ecu-emulator.png)
 
-### Liveview: http://<ip>:8010
+### Liveview: http://<ip>:8011
 
 #### Interface (Liveview)
 - Top bar: WebSocket status (`connected/connecting`), visual latency via the dot (green/red).
@@ -194,7 +194,7 @@ sudo systemctl daemon-reload
 ```
 
 Le repo ne contient pas de `can-tx.service` prêt à l’emploi. Crée-en un similaire à `liveview.service` avec:
-- `ExecStart=uvicorn can_tx_emulator:app --host 0.0.0.0 --port 8000`
+- `ExecStart=uvicorn can_tx_emulator:app --host 0.0.0.0 --port 8001`
 - `WorkingDirectory=/opt/golf4-can-bench`
 
 Commandes:
@@ -260,7 +260,7 @@ journalctl -u can-tx.service -n 200 --no-pager
 
 Change the port or stop the service using it:
 ```bash
-sudo ss -ltnp 'sport = :8010'
+sudo ss -ltnp 'sport = :8011'
 sudo systemctl stop liveview.service
 ```
 
