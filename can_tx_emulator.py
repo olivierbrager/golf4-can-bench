@@ -187,30 +187,54 @@ def _apply_update(update: Dict[str, Any]) -> None:
             continue
 
         # integers
-        if k in ("rpm", "throttle", "load", "speed", "coolant", "iat", "oil_temp", "dtc_count", "counter"):
+        if k in (
+            "rpm", "throttle", "load", "speed", "coolant", "iat", "oil_temp", "dtc_count", "counter",
+            "flex_mode", "egt_alarm", "oil_press_alarm", "dsg_gear", "dsg_clutch_slip_rpm",
+            "dsg_mode", "dsg_shift_request", "launch_active", "tcu_ready", "knock_count",
+        ):
             try:
                 iv = int(v)
             except Exception:
                 continue
 
             if k == "rpm":
-                iv = max(0, min(7000, iv))
+                iv = max(0, min(9000, iv))
             elif k in ("throttle", "load"):
                 iv = max(0, min(100, iv))
             elif k == "speed":
-                iv = max(0, min(250, iv))
+                iv = max(0, min(300, iv))
             elif k in ("coolant", "iat", "oil_temp"):
-                iv = max(-40, min(150, iv))
+                iv = max(-40, min(215, iv))
             elif k == "dtc_count":
                 iv = max(0, min(15, iv))
             elif k == "counter":
                 iv = iv & 0xFF
+            elif k == "flex_mode":
+                iv = max(0, min(3, iv))
+            elif k in ("egt_alarm", "oil_press_alarm", "launch_active", "tcu_ready"):
+                iv = 1 if iv else 0
+            elif k == "dsg_gear":
+                iv = max(0, min(10, iv))
+            elif k == "dsg_clutch_slip_rpm":
+                iv = max(0, min(5000, iv))
+            elif k == "dsg_mode":
+                iv = max(0, min(7, iv))
+            elif k == "dsg_shift_request":
+                iv = max(0, min(3, iv))
+            elif k == "knock_count":
+                iv = max(0, min(65535, iv))
 
             setattr(state, k, iv)
             continue
 
         # floats
-        if k in ("battery_voltage", "lambda_value", "driver_torque_req", "indicated_torque", "boost_pressure", "map_kpa"):
+        if k in (
+            "battery_voltage", "lambda_value", "driver_torque_req", "indicated_torque", "boost_pressure", "map_kpa",
+            "afr", "fuel_pressure_kpa", "oil_pressure_kpa", "egt_c", "boost_target_kpa", "boost_error_kpa",
+            "wgdc_pct", "n75_pct", "turbo_speed_krpm", "ign_angle_deg", "dwell_ms", "inj_pw_ms",
+            "fuel_trim_st", "fuel_trim_lt", "lambda_target", "fuel_temp_c", "ethanol_pct", "stoich_afr",
+            "fuel_density", "knock_retard_deg", "iat_comp_pct", "dsg_trans_temp_c",
+        ):
             try:
                 fv = float(v)
             except Exception:
@@ -221,12 +245,107 @@ def _apply_update(update: Dict[str, Any]) -> None:
             elif k == "lambda_value":
                 fv = float(clamp(fv, 0.5, 1.5))
             elif k in ("boost_pressure", "map_kpa"):
-                fv = float(clamp(fv, 0.0, 510.0))
+                fv = float(clamp(fv, 0.0, 300.0))
             elif k in ("driver_torque_req", "indicated_torque"):
                 fv = float(clamp(fv, -500.0, 500.0))
+            elif k == "afr":
+                fv = float(clamp(fv, 0.0, 25.5))
+            elif k in ("fuel_pressure_kpa", "oil_pressure_kpa"):
+                fv = float(clamp(fv, 0.0, 2000.0))
+            elif k == "egt_c":
+                fv = float(clamp(fv, 0.0, 1200.0))
+            elif k == "boost_target_kpa":
+                fv = float(clamp(fv, 0.0, 300.0))
+            elif k == "boost_error_kpa":
+                fv = float(clamp(fv, -300.0, 300.0))
+            elif k in ("wgdc_pct", "n75_pct"):
+                fv = float(clamp(fv, 0.0, 100.0))
+            elif k == "turbo_speed_krpm":
+                fv = float(clamp(fv, 0.0, 400.0))
+            elif k == "ign_angle_deg":
+                fv = float(clamp(fv, -30.0, 60.0))
+            elif k in ("dwell_ms", "inj_pw_ms"):
+                fv = float(clamp(fv, 0.0, 12.75))
+            elif k in ("fuel_trim_st", "fuel_trim_lt"):
+                fv = float(clamp(fv, -100.0, 100.0))
+            elif k == "lambda_target":
+                fv = float(clamp(fv, 0.0, 2.55))
+            elif k == "fuel_temp_c":
+                fv = float(clamp(fv, -40.0, 215.0))
+            elif k == "ethanol_pct":
+                fv = float(clamp(fv, 0.0, 100.0))
+            elif k == "stoich_afr":
+                fv = float(clamp(fv, 8.0, 20.0))
+            elif k == "fuel_density":
+                fv = float(clamp(fv, 0.0, 25.5))
+            elif k == "knock_retard_deg":
+                fv = float(clamp(fv, 0.0, 20.0))
+            elif k == "iat_comp_pct":
+                fv = float(clamp(fv, -50.0, 50.0))
+            elif k == "dsg_trans_temp_c":
+                fv = float(clamp(fv, -40.0, 215.0))
 
             setattr(state, k, fv)
             continue
+
+
+def _sync_extended_signals() -> None:
+    """Keep extended DBC signals coherent from core engine state."""
+    # Boost control
+    state.boost_target_kpa = float(clamp(100.0 + state.throttle * 1.6, 100.0, 300.0))
+    state.boost_error_kpa = float(clamp(state.boost_target_kpa - state.map_kpa, -300.0, 300.0))
+    state.wgdc_pct = float(clamp(20.0 + state.throttle * 0.8, 0.0, 100.0))
+    state.n75_pct = state.wgdc_pct
+    state.turbo_speed_krpm = float(clamp((state.rpm / 40.0) + max(0.0, state.map_kpa - 100.0) * 0.45, 0.0, 400.0))
+
+    # Flex fuel / stoich model
+    state.stoich_afr = float(clamp(14.7 - (state.ethanol_pct / 100.0) * 5.0, 8.0, 20.0))
+    state.flex_mode = 2 if state.ethanol_pct >= 70.0 else 1 if state.ethanol_pct > 5.0 else 0
+    state.fuel_density = float(clamp(7.4 - (state.ethanol_pct / 100.0) * 1.0, 0.0, 25.5))
+
+    # Combustion / fueling
+    state.lambda_target = 1.00 if state.throttle < 20 else 0.85
+    state.lambda_value = float(clamp(state.lambda_value, 0.70, 1.30))
+    state.afr = float(clamp(state.stoich_afr * state.lambda_value, 0.0, 25.5))
+    state.fuel_trim_st = float(clamp((state.lambda_target - state.lambda_value) * 100.0, -100.0, 100.0))
+    state.fuel_trim_lt = float(clamp(state.fuel_trim_lt * 0.98 + state.fuel_trim_st * 0.02, -100.0, 100.0))
+    state.inj_pw_ms = float(clamp(1.2 + state.load * 0.055, 0.0, 12.75))
+    state.dwell_ms = float(clamp(2.0 + state.rpm / 4000.0, 0.0, 12.75))
+    state.ign_angle_deg = float(clamp(18.0 - max(0.0, state.map_kpa - 100.0) * 0.06 - state.knock_retard_deg * 0.5, -30.0, 60.0))
+    state.fuel_temp_c = float(clamp(25.0 + state.load * 0.45, -40.0, 215.0))
+
+    # Pressures / temps / compensations
+    state.fuel_pressure_kpa = float(clamp(300.0 + state.load * 5.0, 0.0, 2000.0))
+    state.oil_pressure_kpa = float(clamp(120.0 + state.rpm * 0.08, 0.0, 2000.0))
+    state.egt_c = float(clamp(380.0 + state.load * 5.0 + max(0.0, state.map_kpa - 100.0) * 1.2, 0.0, 1200.0))
+    state.iat_comp_pct = float(clamp(-(state.iat - 25.0) * 0.6, -50.0, 50.0))
+    state.egt_alarm = 1 if state.egt_c > 980.0 else 0
+    state.oil_press_alarm = 1 if (state.rpm > 2000 and state.oil_pressure_kpa < 140.0) else 0
+
+    # Knock / DSG
+    state.knock_retard_deg = float(clamp(state.knock_retard_deg, 0.0, 20.0))
+    state.knock_count = int(clamp(state.knock_count, 0, 65535))
+    if state.engine_on:
+        if state.speed < 5:
+            state.dsg_gear = 1
+        elif state.speed < 30:
+            state.dsg_gear = 2
+        elif state.speed < 55:
+            state.dsg_gear = 3
+        elif state.speed < 85:
+            state.dsg_gear = 4
+        elif state.speed < 120:
+            state.dsg_gear = 5
+        else:
+            state.dsg_gear = 6
+    else:
+        state.dsg_gear = 0
+    state.dsg_mode = 4 if state.throttle > 75 else 3
+    state.dsg_shift_request = 1 if state.rpm > 6400 else 2 if state.rpm < 1300 and state.speed > 20 else 0
+    state.launch_active = 1 if (state.speed < 5 and state.throttle > 85 and not state.brake_switch) else 0
+    state.dsg_clutch_slip_rpm = int(clamp(abs(state.rpm - max(800, state.speed * 45)), 0, 5000))
+    state.dsg_trans_temp_c = float(clamp(state.dsg_trans_temp_c + (state.load / 100.0) * 0.15, -40.0, 215.0))
+    state.tcu_ready = 1
 
 
 async def broadcast_state() -> None:
@@ -262,6 +381,12 @@ def _set_base():
     state.brake_switch = False
     state.clutch_switch = False
     state.dtc_count = 0
+    state.ethanol_pct = 0.0
+    state.knock_retard_deg = 0.0
+    state.knock_count = 0
+    state.fuel_trim_st = 0.0
+    state.fuel_trim_lt = 0.0
+    state.dsg_trans_temp_c = 60.0
 
 
 async def run_scenario(name: str) -> None:
@@ -291,6 +416,9 @@ async def run_scenario(name: str) -> None:
         state.lambda_value = 1.000
         state.driver_torque_req = 0.0
         state.indicated_torque = 0.0
+        state.ethanol_pct = 0.0
+        state.knock_retard_deg = 0.0
+        _sync_extended_signals()
         return
 
     if name == "cruise":
@@ -304,6 +432,9 @@ async def run_scenario(name: str) -> None:
         state.lambda_value = 1.000
         state.driver_torque_req = 120.0
         state.indicated_torque = 140.0
+        state.ethanol_pct = 20.0
+        state.knock_retard_deg = 0.5
+        _sync_extended_signals()
         return
 
     if name == "wot":
@@ -316,6 +447,9 @@ async def run_scenario(name: str) -> None:
         state.lambda_value = 0.88
         state.driver_torque_req = 380.0
         state.indicated_torque = 420.0
+        state.ethanol_pct = 65.0
+        state.knock_retard_deg = 2.0
+        _sync_extended_signals()
         return
 
     if name == "ramp":
@@ -335,54 +469,9 @@ async def run_scenario(name: str) -> None:
             state.driver_torque_req = float(clamp(-20 + t * 420, -500, 500))
             state.indicated_torque = float(clamp(0 + t * 450, -500, 500))
             state.lambda_value = float(clamp(1.05 - t * 0.20, 0.5, 1.5))
-            # crude but useful dev dynamics (keeps debug alive)
-            state.boost_target_kpa = max(100.0, min(260.0, 100.0 + state.throttle * 1.6))
-            state.boost_error_kpa = (state.boost_target_kpa - state.map_kpa)
-            
-            state.wgdc_pct = max(0.0, min(100.0, 20.0 + state.throttle * 0.8))
-            state.n75_pct = state.wgdc_pct
-            state.turbo_speed_krpm = max(0.0, min(250.0, state.rpm / 60.0))
-            
-            # FlexFuel: ethanol ramps slowly toward target set by scenario (if you have one)
-            # keep stoich coherent
-            state.stoich_afr = 14.7 - (state.ethanol_pct / 100.0) * 5.0  # ~14.7 -> ~9.7
-            state.flex_mode = 1 if state.ethanol_pct > 5 else 0
-            
-            # Lambda/AFR
-            state.lambda_target = 1.00 if state.throttle < 20 else 0.85
-            state.lambda_value = max(0.70, min(1.30, state.lambda_target + (state.fuel_trim_st / 200.0)))
-            state.afr = state.stoich_afr * state.lambda_value
-            
-            # Trims + inj
-            state.fuel_trim_st = max(-15.0, min(15.0, (1.0 - state.lambda_value) * 20.0))
-            state.fuel_trim_lt = max(-10.0, min(10.0, state.fuel_trim_lt + state.fuel_trim_st * 0.01))
-            state.inj_pw_ms = max(1.0, min(12.0, 2.5 + state.load * 0.04))
-            state.ign_angle_deg = max(-10.0, min(35.0, 12.0 - (state.map_kpa - 100.0) * 0.05))
-            
-            # Pressures / temps
-            state.fuel_pressure_kpa = 350.0 + state.load * 3.0
-            state.oil_pressure_kpa = 120.0 + state.rpm * 0.06
-            state.iat = 25.0 + (state.map_kpa - 100.0) * 0.08
-            state.egt_c = 450.0 + state.load * 4.0
-            
-            state.oil_press_alarm = 1 if (state.rpm > 2000 and state.oil_pressure_kpa < 140.0) else 0
-            state.egt_alarm = 1 if state.egt_c > 980.0 else 0
-            
-            # DSG (very rough)
-            if state.speed < 5:
-                state.dsg_gear = 1
-            elif state.speed < 30:
-                state.dsg_gear = 2
-            elif state.speed < 55:
-                state.dsg_gear = 3
-            elif state.speed < 85:
-                state.dsg_gear = 4
-            elif state.speed < 120:
-                state.dsg_gear = 5
-            else:
-                state.dsg_gear = 6
-            state.dsg_trans_temp_c = max(40.0, min(130.0, state.dsg_trans_temp_c + (state.load/100.0)*0.2))
-            state.tcu_ready = 1
+            state.ethanol_pct = float(clamp(5.0 + t * 60.0, 0.0, 100.0))
+            state.knock_retard_deg = float(clamp(max(0.0, (state.map_kpa - 180.0) * 0.03), 0.0, 20.0))
+            _sync_extended_signals()
             await asyncio.sleep(duration / steps)
         return
 
@@ -438,6 +527,9 @@ async def run_scenario(name: str) -> None:
 
                 # Fan request reacts to coolant
                 state.fan_request = (state.coolant >= 105)
+                state.ethanol_pct = float(clamp(10.0 + s3 * 70.0, 0.0, 100.0))
+                state.knock_retard_deg = float(clamp((state.load / 100.0) * 6.0, 0.0, 20.0))
+                _sync_extended_signals()
 
                 await asyncio.sleep(dt)
             # loop continues
@@ -495,6 +587,9 @@ async def run_scenario(name: str) -> None:
                     state.brake_switch = False
                     state.clutch_switch = False
                     state.dtc_count = 0
+                    state.ethanol_pct = 0.0
+                    state.knock_retard_deg = 0.0
+                    _sync_extended_signals()
 
                     await asyncio.sleep(dt)
                     continue
@@ -548,6 +643,9 @@ async def run_scenario(name: str) -> None:
 
                     # DTC count rises a bit
                     state.dtc_count = int(clamp(round(x * 6), 0, 15))
+                    state.ethanol_pct = float(clamp(10.0 + x * 55.0, 0.0, 100.0))
+                    state.knock_retard_deg = float(clamp((state.map_kpa - 120.0) * 0.035, 0.0, 20.0))
+                    _sync_extended_signals()
 
                     await asyncio.sleep(dt)
                     continue
@@ -578,6 +676,9 @@ async def run_scenario(name: str) -> None:
                     state.fan_request = blink
                     state.brake_switch = blink
                     state.clutch_switch = blink
+                    state.ethanol_pct = 65.0
+                    state.knock_retard_deg = 4.0
+                    _sync_extended_signals()
 
                     await asyncio.sleep(dt)
                     continue
@@ -625,6 +726,9 @@ async def run_scenario(name: str) -> None:
 
                     # DTC count decreases
                     state.dtc_count = int(clamp(round(y * 15), 0, 15))
+                    state.ethanol_pct = float(clamp(65.0 - x * 45.0, 0.0, 100.0))
+                    state.knock_retard_deg = float(clamp((state.map_kpa - 120.0) * 0.03, 0.0, 20.0))
+                    _sync_extended_signals()
 
                     await asyncio.sleep(dt)
                     continue
@@ -668,6 +772,9 @@ async def run_scenario(name: str) -> None:
                     state.cruise_active = (p2 > 0.6)
 
                     state.dtc_count = int(clamp(round(p3 * 15), 0, 15))
+                    state.ethanol_pct = float(clamp(20.0 + p2 * 50.0, 0.0, 100.0))
+                    state.knock_retard_deg = float(clamp((state.load / 100.0) * 8.0, 0.0, 20.0))
+                    _sync_extended_signals()
 
                     await asyncio.sleep(dt)
                     continue
