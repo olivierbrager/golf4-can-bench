@@ -39,3 +39,8 @@ Pour les activer, définir `DEBUG=1` (ou `true`/`yes`) avant de lancer l’app.
 Interprétation rapide:
 - `rx_frames_per_sec` permet de vérifier le débit RX sans instrumenter la UI.
 - `ws_updates_dropped_total` doit rester proche de 0 en situation nominale.
+
+## Notes Street (runtime)
+- Le mode Street calcule un maximum glissant local pour les aiguilles grises d’ombre (1 seconde).
+- Ce calcul est côté front (`static/views/street.js`) et fonctionne indépendamment de `DEBUG`.
+- Référence fonctionnelle: `docs/street-counters-spec.md`.

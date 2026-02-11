@@ -7,7 +7,7 @@ Golf 4 CAN Bench: émulateur ECU (TX) + liveview (RX) avec UI web. Loopback OK, 
 Invariants concrets:
 - Démarrage Dev/Debug sans erreur pour TX et liveview.
 - Flux RX/WS stable (pas de crash, pas de reconnexion en boucle).
-- UI inchangée: pas de régression visuelle ou fonctionnelle.
+- UI stable: pas de régression visuelle ou fonctionnelle par rapport au design retenu.
 - DBC compatible: décodage stable, pas de champs cassés.
 - Doc cohérente avec le repo (`/opt/golf4-can-bench`, `requirements.txt`, services systemd).
 
@@ -17,6 +17,7 @@ Invariants concrets:
 - Toujours reviewer `git diff`.
 - Interdire modifications UI/RX/WS sans tests/flags et sans métriques.
 - Pas de refactor large sans plan.
+- Toute modif Street doit être alignée avec `docs/street-counters-spec.md` (ou mettre à jour cette spec dans le même change).
 
 ## 4) Workflow recommandé (checklist)
 - Créer une branche dédiée.

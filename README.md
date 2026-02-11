@@ -99,8 +99,11 @@ Le TX lit sa configuration dans `frames.yaml` (bus, DBC, messages, périodes, ma
   - Derived KPIs (5s rolling window).
   - Synthetic flags.
 - Street:
-  - Audi-style dashboard for road driving (speed ring, RPM bar, BOOST/LAMBDA/OIL/COOLANT/BATTERY cards).
+  - Audi-style dual dial cluster (left RPM, right speed).
+  - Right speed scale is non-linear (0..300 km/h) with 100 km/h at vertical top.
+  - Shadow needle on both dials represents rolling max (1s window), hidden when ~= current value.
   - Uses compatibility aliases (`compat.signals`) to stay robust across DBC variants.
+  - Retained counter settings/spec: `docs/street-counters-spec.md`.
 
 #### Snapshots (UI)
 Debug:
@@ -108,6 +111,9 @@ Debug:
 
 Dev:
 ![Liveview Dev](docs/snapshots/liveview-dev.png)
+
+Street:
+![Liveview Street](docs/snapshots/liveview-street.png)
 
 
 #### Snapshots (snippets)
