@@ -64,8 +64,6 @@ export function renderStreet(payload){
   const bst = getSig(payload,"Boost");
   const thr = getSig(payload,"Throttle");
   const load = getSig(payload,"Load");
-  const oil = getSig(payload,"OilTemp");
-  const clt = getSig(payload,"CoolantTemp");
   const iat = getAny(payload, "IAT_C");
   const gear = getAny(payload, "Gear");
 
@@ -108,7 +106,7 @@ export function renderStreet(payload){
   host.innerHTML = `
     <div class="audi-classic" style="--rpm:${rpmPct}; --spd:${spdPct}; --boost:${boostPct}; --load:${loadPct}; --thr:${thrPct};">
       <div class="top-bar">
-        <div class="top-left">⛽ ${int(550)} km · Des Konn…</div>
+        <div class="top-left"></div>
         <div class="top-right">⋯</div>
       </div>
 
@@ -155,11 +153,7 @@ export function renderStreet(payload){
       </div>
 
       <div class="bottom-bar">
-        <div class="bottom-left">
-          <span>${int(clt?.v)}°C</span>
-          <span class="sep">•</span>
-          <span>${int(oil?.v)}°C</span>
-        </div>
+        <div class="bottom-left"></div>
         <div class="bottom-center">${timeHHMM()}</div>
         <div class="bottom-right">+${int(iat?.v)}.0°C</div>
       </div>
