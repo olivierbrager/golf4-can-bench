@@ -12,6 +12,24 @@ function getAny(payload, name){
   return payload?.signals?.[name] || payload?.raw?.[name] || null;
 }
 
+function getFirst(payload, names){
+  for(const name of names){
+    const sig = getAny(payload, name);
+    if(sig) return sig;
+  }
+  return null;
+}
+
+function sigNum(payload, names, fallback=0){
+  const sig = getFirst(payload, names);
+  const n = Number(sig?.v);
+  return Number.isFinite(n) ? n : fallback;
+}
+
+function sigOn(payload, names){
+  return sigNum(payload, names, 0) > 0.5;
+}
+
 function fmt(v, digits=1){
   if(v === null || v === undefined || Number.isNaN(v)) return "—";
   const n = Number(v);
@@ -99,6 +117,7 @@ export function renderStreet(payload){
   const nowMs = Date.now();
   const rpmMax3s = rollingMax(rpmHistory, rpmVal, nowMs);
   const speedMax3s = rollingMax(speedHistory, speed, nowMs);
+  const blinkOn = Math.floor(nowMs / 420) % 2 === 0;
 
   const rpmPct = pct(rpmVal || 0, 0, 8000);
   const spdPct = speedArcT(speed || 0) * 100;
@@ -110,6 +129,26 @@ export function renderStreet(payload){
   const loadPct = pct(load?.v || 0, 0, 100);
   const thrPct = pct(thr?.v || 0, 0, 100);
   const engagedGear = gearDisplay(gear?.v);
+  const dtcCount = sigNum(payload, ["DTC_Count", "DTC_count", "DTCCount"], 0);
+  const milOn = sigOn(payload, ["MIL"]);
+  const epcOn = sigOn(payload, ["EPC"]);
+  const brakeOn = sigOn(payload, ["BrakeSwitch", "Brake"]);
+  const parkOn = sigOn(payload, ["ClutchSwitch"]);
+  const cruiseOn = sigOn(payload, ["Cruise", "CruiseActive"]);
+
+  const warningTopItems = [
+    { kind: "arrow", on: cruiseOn && blinkOn, title: "Left indicator", dir: "left", text: "\u25b6" },
+    { kind: "img", on: milOn, title: "Engine", src: "/static/warning_icons/check_engine_128.png" },
+    { kind: "img", on: dtcCount > 1 || milOn || epcOn, title: "Master warning", src: "/static/warning_icons/warning_triangle_128.png" },
+    { kind: "img", on: parkOn || (brakeOn && (Number(speed) < 2)), title: "Parking brake", src: "/static/warning_icons/parking_brake_128.png" },
+    { kind: "arrow", on: cruiseOn && !blinkOn, title: "Right indicator", dir: "right", text: "\u25b6" },
+  ];
+  const warningTopHtml = warningTopItems.map((item) => {
+    if(item.kind === "arrow"){
+      return `<span class="warning-led warning-arrow arrow-${item.dir} ${item.on ? "on" : "off"}" title="${item.title}">${item.text}</span>`;
+    }
+    return `<span class="warning-led ${item.on ? "on" : "off"}" title="${item.title}"><img src="${item.src}" alt="${item.title}"></span>`;
+  }).join("");
 
   const host = $("#street-dashboard");
   if(!host) return;
@@ -170,6 +209,22 @@ export function renderStreet(payload){
       <div class="top-bar">
         <div class="top-left"></div>
         <div class="top-right">⋯</div>
+      </div>
+      <div class="warning-top">
+        <svg class="warning-outline" viewBox="0 0 420 86" preserveAspectRatio="none" aria-hidden="true">
+          <defs>
+            <linearGradient id="warning-trace-grad" x1="0" y1="34" x2="0" y2="-6" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#c6ceda" stop-opacity="0.78"></stop>
+              <stop offset="62%" stop-color="#c6ceda" stop-opacity="0.44"></stop>
+              <stop offset="100%" stop-color="#c6ceda" stop-opacity="0.00"></stop>
+            </linearGradient>
+          </defs>
+          <path class="fill" d="M-81 -6 L-17.1 29.2 A42 42 0 0 0 0 34 L420 34 A42 42 0 0 0 437.1 29.2 L501 -6 L-81 -6 Z"></path>
+          <path class="trace" stroke="url(#warning-trace-grad)" d="M-81 -6 L-17.1 29.2 A42 42 0 0 0 0 34 L420 34 A42 42 0 0 0 437.1 29.2 L501 -6"></path>
+        </svg>
+        <div class="warning-top-strip" aria-label="Warning indicators">
+          ${warningTopHtml}
+        </div>
       </div>
 
       <div class="cluster">
