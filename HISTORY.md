@@ -1,6 +1,25 @@
 # Golf4 CAN Bench History
 
-Dernière mise à jour: 2026-02-11
+Dernière mise à jour: 2026-02-12
+
+## 2026-02-12
+
+### Street UI (warnings / fullscreen)
+- Bandeau warnings haut finalisé (forme trapèze à raccords arrondis tangents), position/espacements affinés.
+- Bandeau bas ajouté comme miroir géométrique du bandeau haut (sans contenu), avec réglages dédiés normal/fullscreen.
+- Icônes warnings Street recentrées, redimensionnées et espacées (normal + fullscreen).
+- Suppression d’éléments centraux non retenus (ligne `D?/A3`, pictos auxiliaires, `...` en tête).
+- Ajout d’un mode fullscreen Street:
+  - URL: `/webui/index.html?fullscreen=street`
+  - Shell UI masqué (tabs/titres/cartes), dash seul à l’écran.
+  - Bouton de lancement ajouté dans la Liveview: `Street Fullscreen`.
+- Conversion des PNG warnings (`static/warning_icons/*.png`) en alpha transparent (fond noir retiré).
+- Glow warnings/clignotants ajusté vers un halo de contour plus subtil (sans disque plein).
+
+### Emulator
+- Nouveau scénario TX `warning_blink`:
+  - clignotement continu des warnings principaux pour validation cluster.
+  - exposé dans l’UI Scenarios (`Warn blink`) et via API `/api/scenario/warning_blink`.
 
 ## 2026-02-11
 

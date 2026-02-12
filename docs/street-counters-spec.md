@@ -1,7 +1,7 @@
 # Street Counters Specs
 
 Reference spec for the `Street` view dual-dial cluster.
-Last updated: 2026-02-11
+Last updated: 2026-02-12
 
 ## Scope
 
@@ -74,6 +74,33 @@ Last updated: 2026-02-11
   - `dial-ring`: `blur(.25px)`.
   - `dial-ring-outer`: `blur(.2px)`.
   - `dial-ticks`: `blur(.2px)`.
+
+## Warning Banners (Street)
+
+- Top warning banner:
+  - Trapezoid style with 3 straight segments + 2 rounded tangent joins.
+  - Static content set for Street: left/right indicator, engine, master warning, parking brake.
+  - Icon spacing and size tuned for normal + fullscreen variants.
+- Bottom banner:
+  - Geometric mirror of top banner (shape only, no icon content).
+  - Enlarged vertically (x1.5 on trace) to match retained visual style.
+  - Fullscreen positioning uses percentage-based bottom offset (responsive to frame height).
+
+## Warning Icons / Glow
+
+- Icons use local assets from `static/warning_icons/`.
+- PNG black backgrounds were converted to transparent alpha.
+- Active warnings use subtle contour glow (yellow/red/green by icon type), not a circular disk halo.
+
+## Fullscreen Street Mode
+
+- Dedicated mode available via URL:
+  - `/webui/index.html?fullscreen=street`
+- In fullscreen:
+  - only the Street dashboard is shown.
+  - top/tabs/debug shell are hidden.
+  - dedicated icon sizing/spacing rules apply to the top warning banner.
+  - bottom warning banner uses fullscreen-specific responsive positioning.
 
 ## Files of Record
 

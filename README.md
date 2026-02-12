@@ -85,6 +85,10 @@ Le TX lit sa configuration dans `frames.yaml` (bus, DBC, messages, périodes, ma
 #### Snapshot (ECU Emulator)
 ![ECU Emulator](docs/snapshots/ecu-emulator.png)
 
+Scenarios:
+- `idle`, `cruise`, `wot`, `ramp`, `needle_sweep`, `dash_test`
+- `warning_blink` (all warning lamps blinking for cluster validation)
+
 ### Liveview: http://<ip>:8011
 
 #### Interface (Liveview)
@@ -104,6 +108,8 @@ Le TX lit sa configuration dans `frames.yaml` (bus, DBC, messages, périodes, ma
   - Shadow needle on both dials represents rolling max (1s window), hidden when ~= current value.
   - Uses compatibility aliases (`compat.signals`) to stay robust across DBC variants.
   - Retained counter settings/spec: `docs/street-counters-spec.md`.
+  - Fullscreen mode: `/webui/index.html?fullscreen=street`.
+  - Quick launch button available in Liveview top bar: `Street Fullscreen`.
 
 #### Snapshots (UI)
 Debug:

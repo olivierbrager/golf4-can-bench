@@ -11,6 +11,8 @@ Ce fichier sert de repère visuel pour le style Audi utilisé dans la vue Street
 - Les fichiers techniques source de vérité restent:
   - `static/views/street.js`
   - `static/styles/street.css`
+- Mode d’inspection visuelle dédié:
+  - `/webui/index.html?fullscreen=street`
 
 ## Important
 - Ce document est une référence d’inspiration.
