@@ -5,6 +5,8 @@ import { renderStreet } from "./views/street.js";
 
 const $ = (s) => document.querySelector(s);
 const $$ = (s) => Array.from(document.querySelectorAll(s));
+const qs = new URLSearchParams(window.location.search);
+const fullscreenStreet = qs.get("fullscreen") === "street";
 
 function showView(name){
   $$("#tabs .tab").forEach(t => t.classList.toggle("active", t.dataset.view === name));
@@ -17,6 +19,17 @@ $("#tabs").addEventListener("click", (e) => {
   showView(t.dataset.view);
 });
 
+$("#open-street-fs")?.addEventListener("click", () => {
+  const url = new URL(window.location.href);
+  url.searchParams.set("fullscreen", "street");
+  window.open(url.toString(), "_blank", "noopener");
+});
+
+if(fullscreenStreet){
+  document.body.classList.add("fullscreen-street");
+  showView("street");
+}
+
 const core = new Core({
   wsEl: $("#ws"),
   dotEl: $("#dot"),
@@ -28,5 +41,8 @@ core.onPayload((p) => {
   renderDev(p);
   renderStreet(p);
 });
+
+// Render a baseline shell immediately (before first WS payload), useful for fullscreen mode.
+renderStreet({ signals:{}, raw:{}, meta:{} });
 
 core.connect();

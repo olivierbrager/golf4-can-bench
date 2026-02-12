@@ -67,6 +67,25 @@ body{
   background: rgba(255,255,255,.08);
   border:1px solid rgba(255,255,255,.10);
 }
+.top-actions{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.fs-btn{
+  border:1px solid var(--stroke);
+  background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+  color:var(--text);
+  border-radius:999px;
+  padding:8px 12px;
+  font-size:12px;
+  font-weight:700;
+  letter-spacing:.2px;
+  cursor:pointer;
+}
+.fs-btn:hover{
+  background: linear-gradient(180deg, rgba(255,255,255,.11), rgba(255,255,255,.05));
+}
 .view{display:none}
 .view.active{display:block}
 .card{
@@ -100,3 +119,45 @@ table{width:100%;border-collapse:collapse}
 th,td{padding:8px;border-bottom:1px solid rgba(255,255,255,.08);font-size:12px}
 th{color:var(--muted2);text-align:left}
 td.right{text-align:right}
+
+body.fullscreen-street{
+  overflow:hidden;
+  background:#02050a;
+}
+body.fullscreen-street .wrap{
+  max-width:none;
+  width:100vw;
+  height:100vh;
+  margin:0;
+  padding:0;
+}
+body.fullscreen-street .top{
+  display:none;
+}
+body.fullscreen-street .view{
+  display:none;
+}
+body.fullscreen-street #view-street{
+  display:block;
+  width:100vw;
+  height:100vh;
+}
+body.fullscreen-street #view-street .card{
+  border:none;
+  border-radius:0;
+  background:transparent;
+  box-shadow:none;
+  height:100%;
+}
+body.fullscreen-street #view-street .head{
+  display:none;
+}
+body.fullscreen-street #view-street .body{
+  padding:0;
+  height:100%;
+  display:grid;
+  place-items:center;
+}
+body.fullscreen-street #street-dashboard{
+  width:100vw;
+}

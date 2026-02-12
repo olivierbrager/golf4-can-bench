@@ -5,6 +5,7 @@
 #   - ramp (8s one-shot sweep)
 #   - needle_sweep (30s loop sweeping ALL UI params)
 #   - dash_test (30s advanced dashboard test: min/max holds, all-blink, LED chase, async ramps)
+#   - warning_blink (continuous all-warning blinker for cluster validation)
 #
 # Requirements:
 #   pip install python-can cantools fastapi "uvicorn[standard]" pyyaml
@@ -396,6 +397,7 @@ async def run_scenario(name: str) -> None:
       - ramp: one-shot sweep (8s)
       - needle_sweep: continuous 30s loop sweeping ALL UI parameters (dashboard debug)
       - dash_test: advanced 30s loop (holds, blink, chase, async ramps)
+      - warning_blink: continuous all-warning blinker (cluster validation)
     """
     global scenario_name
     scenario_name = name
@@ -782,6 +784,47 @@ async def run_scenario(name: str) -> None:
             # loop repeats every 30s
         return
 
+    if name == "warning_blink":
+        # Continuous all-warning blinker for cluster/icon validation.
+        # Keeps powertrain near idle while toggling all warning-relevant signals.
+        state.engine_on = True
+        state.rpm = 950
+        state.throttle = 3
+        state.load = 12
+        state.speed = 0
+        state.coolant = 96
+        state.iat = 24
+        state.oil_temp = 92
+        state.battery_voltage = 13.6
+        state.lambda_value = 1.000
+        state.map_kpa = 100.0
+        state.boost_pressure = 100.0
+        state.driver_torque_req = 0.0
+        state.indicated_torque = 0.0
+
+        tick = 0
+        while not scenario_cancel.is_set():
+            on = (tick % 2) == 0
+
+            # Street top cluster warnings
+            state.mil = on
+            state.epc = on
+            state.dtc_count = 12 if on else 0
+            state.cruise_active = True  # arrows alternate in UI while cruise is active
+            state.brake_switch = on
+            state.clutch_switch = on
+            state.fan_request = on
+
+            # Extended warning-style flags
+            state.egt_alarm = 1 if on else 0
+            state.oil_press_alarm = 1 if on else 0
+            state.launch_active = 1 if on else 0
+
+            _sync_extended_signals()
+            await asyncio.sleep(0.35)
+            tick += 1
+        return
+
     raise ValueError(f"Unknown scenario '{name}'")
 
 
@@ -983,6 +1026,7 @@ INDEX_HTML = r"""<!doctype html>
           <button class="btn small" id="scRamp">Ramp</button>
           <button class="btn small" id="scNeedle">Needle sweep</button>
           <button class="btn small" id="scDash">Dash test</button>
+          <button class="btn small" id="scWarn">Warn blink</button>
           <button class="btn small danger" id="scStop">Stop</button>
         </div>
         <div class="tag">Active: <b id="scenarioName">manual</b></div>
@@ -1371,6 +1415,7 @@ INDEX_HTML = r"""<!doctype html>
   document.getElementById("scRamp").addEventListener("click", () => startScenario("ramp"));
   document.getElementById("scNeedle").addEventListener("click", () => startScenario("needle_sweep"));
   document.getElementById("scDash").addEventListener("click", () => startScenario("dash_test"));
+  document.getElementById("scWarn").addEventListener("click", () => startScenario("warning_blink"));
   document.getElementById("scStop").addEventListener("click", () => stopScenario());
 
   const rpm = bindRange("rpm", "rpmVal", "rpm", false, 0);
@@ -1542,7 +1587,7 @@ def get_state():
 async def api_start_scenario(name: str):
     global scenario_task, scenario_name
 
-    allowed = {"idle", "cruise", "wot", "ramp", "needle_sweep", "dash_test"}
+    allowed = {"idle", "cruise", "wot", "ramp", "needle_sweep", "dash_test", "warning_blink"}
     if name not in allowed:
         raise HTTPException(status_code=400, detail="Unknown scenario")
 
