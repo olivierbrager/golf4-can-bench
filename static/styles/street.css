@@ -44,6 +44,9 @@
   --tick-step: 8.125deg;
   --tick-major: 32.5deg;
   --cluster-gap: 16px;
+  --dial-scale-x-street: 1.02;
+  --dial-scale-y-street: 1.06;
+  --dial-shift-y-street: 2px;
   --center-col-w: calc((100% - (2 * var(--cluster-gap))) * 1.2 / 3.2);
 
   padding:14px 16px;
@@ -114,11 +117,41 @@
   display:flex;
   align-items:center;
   justify-content:center;
-  gap:44px;
+  gap:52px;
   height:100%;
-  padding:0 56px 8px 56px;
+  padding:0 44px 8px 44px;
   clip-path:none;
   overflow:visible;
+}
+.warning-bottom{
+  position:absolute;
+  left:50%;
+  bottom:178px;
+  transform:translateX(-50%);
+  width: var(--center-col-w);
+  height: 64px;
+  --warn-glow: rgba(170,184,202,.10);
+  z-index:6;
+  pointer-events:none;
+}
+.warning-outline-bottom{
+  position:absolute;
+  inset:-8px -8px -2px -8px;
+  overflow:visible;
+  pointer-events:none;
+  z-index:2;
+  transform: scaleY(-1.5);
+  transform-origin: 50% 100%;
+}
+.warning-outline-bottom .fill{
+  fill: rgba(4,8,14,.93);
+}
+.warning-outline-bottom .trace{
+  fill:none;
+  stroke-width:3;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+  filter: drop-shadow(0 0 2px var(--warn-glow));
 }
 .warning-led{
   --icon-shift-y: -20px;
@@ -165,16 +198,18 @@
 
 .cluster{
   display:grid;
-  grid-template-columns: 1fr 1.2fr 1fr;
+  grid-template-columns: 1fr 1.15fr 1fr;
   gap:var(--cluster-gap);
   align-items:center;
-  margin-top: 10px;
+  margin-top: 16px;
 }
 
 .dial{
   position:relative;
   isolation:isolate;
   aspect-ratio:1/1;
+  transform: translateY(var(--dial-shift-y-street)) scaleX(var(--dial-scale-x-street)) scaleY(var(--dial-scale-y-street));
+  transform-origin:center center;
   border-radius:50%;
   background:
     radial-gradient(circle at 50% 52%, rgba(16,18,24,.98) 0 52%, rgba(6,8,12,.99) 68%, rgba(3,4,6,1) 100%),
@@ -185,6 +220,7 @@
     inset 0 0 30px rgba(0,0,0,.85),
     0 20px 50px rgba(0,0,0,.6);
 }
+.dial::after{ content:none; }
 .dial-left{
   font-family: var(--font);
 }
@@ -215,7 +251,29 @@
     inset 0 -1px 0 rgba(20,24,30,.72),
     0 0 8px rgba(255,255,255,.16);
   pointer-events:none;
-  filter: blur(.2px);
+  filter: blur(.12px);
+  overflow:hidden;
+}
+.dial-ring-outer::before{
+  content:"";
+  position:absolute;
+  inset:-1px;
+  border-radius:50%;
+  padding:6px;
+  pointer-events:none;
+  z-index:3;
+  background:
+    linear-gradient(48deg,
+      rgba(255,255,255,0.00) 28%,
+      rgba(244,250,255,0.54) 44%,
+      rgba(220,232,248,0.24) 53%,
+      rgba(255,255,255,0.00) 64%) border-box;
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity:.60;
 }
 .dial-inner{
   position:absolute;
@@ -423,6 +481,8 @@
 }
 
 .center-panel{
+  width:94%;
+  justify-self:center;
   border-radius:14px;
   border:1px solid var(--stroke);
   aspect-ratio: 16 / 9;
@@ -455,6 +515,8 @@
 }
 
 .bottom-bar{
+  position:relative;
+  z-index:9;
   margin-top:10px;
   display:flex;
   justify-content:space-between;

@@ -208,7 +208,7 @@ export function renderStreet(payload){
     <div class="audi-classic" style="--rpm:${rpmPct}; --spd:${spdPct}; --boost:${boostPct}; --load:${loadPct}; --thr:${thrPct};">
       <div class="top-bar">
         <div class="top-left"></div>
-        <div class="top-right">⋯</div>
+        <div class="top-right"></div>
       </div>
       <div class="warning-top">
         <svg class="warning-outline" viewBox="0 0 420 86" preserveAspectRatio="none" aria-hidden="true">
@@ -249,13 +249,6 @@ export function renderStreet(payload){
         </div>
 
         <div class="center-panel">
-          <div class="center-top">
-            <div class="mode">${engagedGear}</div>
-            <div class="car">A3</div>
-          </div>
-          <div class="center-icons">
-            <span>△</span><span>⚙</span><span>☀</span><span>☂</span>
-          </div>
         </div>
 
         <div class="dial dial-right">
@@ -278,10 +271,24 @@ export function renderStreet(payload){
         </div>
       </div>
 
+      <div class="warning-bottom" aria-hidden="true">
+        <svg class="warning-outline-bottom" viewBox="0 0 420 86" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="warning-trace-grad-bottom" x1="0" y1="34" x2="0" y2="-6" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#c6ceda" stop-opacity="0.78"></stop>
+              <stop offset="62%" stop-color="#c6ceda" stop-opacity="0.44"></stop>
+              <stop offset="100%" stop-color="#c6ceda" stop-opacity="0.00"></stop>
+            </linearGradient>
+          </defs>
+          <path class="fill" d="M-81 -6 L-17.1 29.2 A42 42 0 0 0 0 34 L420 34 A42 42 0 0 0 437.1 29.2 L501 -6 L-81 -6 Z"></path>
+          <path class="trace" stroke="url(#warning-trace-grad-bottom)" d="M-81 -6 L-17.1 29.2 A42 42 0 0 0 0 34 L420 34 A42 42 0 0 0 437.1 29.2 L501 -6"></path>
+        </svg>
+      </div>
+
       <div class="bottom-bar">
-        <div class="bottom-left"></div>
-        <div class="bottom-center">${timeHHMM()}</div>
-        <div class="bottom-right">+${int(iat?.v)}.0°C</div>
+        <div class="bottom-left">${timeHHMM()}</div>
+        <div class="bottom-center"></div>
+        <div class="bottom-right">${int(iat?.v)}.0°C</div>
       </div>
     </div>
   `;
