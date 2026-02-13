@@ -331,6 +331,7 @@ body.fullscreen-street .warning-arrow{
 .dial{
   position:relative;
   isolation:isolate;
+  z-index:10;
   aspect-ratio:1/1;
   transform: translateY(var(--dial-shift-y-street)) scaleX(var(--dial-scale-x-street)) scaleY(var(--dial-scale-y-street));
   transform-origin:center center;
@@ -642,20 +643,25 @@ body.fullscreen-street .warning-arrow{
 }
 .street-map-frame{
   position:absolute;
-  inset:-40%;
+  inset:-60%;
   width:auto;
   height:auto;
   border:0;
-  /* Faux dark basemap rendering for embedded OSM tiles */
-  filter: invert(1) hue-rotate(180deg) saturate(0.62) brightness(0.82) contrast(1.08);
   transform-origin:center center;
-  transition: transform 280ms ease-out;
+  transition: transform 700ms ease-out;
   will-change: transform;
+}
+.street-map-floating.expanded .street-map-frame{
+  inset:-82%;
 }
 .street-map-canvas .leaflet-container{
   width:100%;
   height:100%;
   background:#0a0d12;
+}
+.street-map-canvas .leaflet-tile-pane{
+  /* Faux dark basemap rendering for OSM tiles only (not overlays/markers). */
+  filter: invert(1) hue-rotate(180deg) saturate(0.62) brightness(0.82) contrast(1.08);
 }
 .street-map-canvas.is-fast-3d .leaflet-container{
   filter: brightness(.99) contrast(1.07) saturate(.96);
@@ -752,6 +758,38 @@ body.fullscreen-street .warning-arrow{
 .street-map-floating{
   position:fixed;
   z-index:7;
+  cursor: zoom-in;
+  transition:
+    left 260ms ease,
+    top 260ms ease,
+    width 260ms ease,
+    height 260ms ease;
+}
+.street-map-floating.expanded{
+  cursor: zoom-out;
+}
+.street-map-floating.expanded .street-speed-limit{
+  top: 6px;
+  right: 6px;
+}
+.street-map-floating.expanded .street-map-status{
+  bottom:24px;
+}
+.street-map-vehicle{
+  width:22px;
+  height:22px;
+  display:grid;
+  place-items:center;
+  transform: rotate(var(--heading-deg, 0deg));
+  transform-origin: 50% 50%;
+  filter:
+    drop-shadow(0 0 1px rgba(255,80,96,.24))
+    drop-shadow(0 0 1.5px rgba(0,0,0,.40));
+}
+.street-map-vehicle .car-top{
+  width:22px;
+  height:22px;
+  display:block;
 }
 
 body.fullscreen-street .street-map-status{

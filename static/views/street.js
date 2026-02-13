@@ -50,6 +50,7 @@ const streetMapState = {
   prevLat: null,
   prevLon: null,
   fastViewOn: false,
+  expanded: false,
 };
 
 function getSig(payload, name){
@@ -464,10 +465,12 @@ function refreshSpeedLimit(lat, lon){
   streetMapState.speedLon = lon;
   void fetchSpeedLimit(lat, lon)
     .then((kph) => {
-      streetMapState.speedLabel = Number.isFinite(kph) ? String(kph) : "--";
+      if(Number.isFinite(kph)){
+        streetMapState.speedLabel = String(kph);
+      }
     })
     .catch(() => {
-      streetMapState.speedLabel = "--";
+      // Keep last known numeric speed-limit value when lookup fails.
     })
     .finally(() => {
       streetMapState.speedBusy = false;
@@ -553,6 +556,18 @@ function ensureMapNode(){
     </div>
     <div class="street-map-status" id="street-map-status">GPS en attente</div>
   `;
+  root.addEventListener("click", () => {
+    streetMapState.expanded = !streetMapState.expanded;
+    root.classList.toggle("expanded", streetMapState.expanded);
+    streetMapState.lastCenterKey = "";
+    const host = $("#street-dashboard");
+    if(host){
+      positionMapNode(host);
+      if(streetMapState.map){
+        streetMapState.map.invalidateSize(false);
+      }
+    }
+  });
   document.body.appendChild(root);
   streetMapState.node = root;
   return root;
@@ -576,19 +591,45 @@ function ensureLeafletMap(){
     boxZoom: false,
     keyboard: false,
     touchZoom: false,
-    updateWhenIdle: true,
+    updateWhenIdle: false,
   });
   window.L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
     maxZoom: 19,
-    keepBuffer: 12,
+    keepBuffer: 32,
   }).addTo(map);
-  const marker = window.L.circleMarker([0, 0], {
-    radius: 5,
-    color: "#ff4f5d",
-    weight: 2,
-    fillColor: "#ff2638",
-    fillOpacity: 0.95,
-  }).addTo(map);
+  const vehicleIcon = window.L.divIcon({
+    className: "street-map-vehicle-wrap",
+    html: `
+      <div class="street-map-vehicle" aria-hidden="true">
+        <svg viewBox="0 0 64 64" class="car-top" focusable="false">
+          <defs>
+            <linearGradient id="carBodyGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#d10f24"/>
+              <stop offset="52%" stop-color="#a30012"/>
+              <stop offset="100%" stop-color="#72000d"/>
+            </linearGradient>
+            <linearGradient id="carGlassGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#1f2c3a"/>
+              <stop offset="100%" stop-color="#101922"/>
+            </linearGradient>
+          </defs>
+          <rect x="18" y="6" width="28" height="52" rx="11" fill="url(#carBodyGrad)" stroke="#430008" stroke-width="2"/>
+          <rect x="22" y="14" width="20" height="14" rx="4" fill="url(#carGlassGrad)" stroke="#6e7f93" stroke-width="1"/>
+          <rect x="22" y="33" width="20" height="11" rx="4" fill="url(#carGlassGrad)" stroke="#6e7f93" stroke-width="1"/>
+          <rect x="16" y="15" width="4" height="9" rx="1.5" fill="#111922"/>
+          <rect x="44" y="15" width="4" height="9" rx="1.5" fill="#111922"/>
+          <rect x="16" y="35" width="4" height="9" rx="1.5" fill="#111922"/>
+          <rect x="44" y="35" width="4" height="9" rx="1.5" fill="#111922"/>
+          <circle cx="24" cy="9" r="1.1" fill="#ff5a64"/>
+          <circle cx="40" cy="9" r="1.1" fill="#ff5a64"/>
+          <circle cx="24" cy="55" r="1.1" fill="#ffb16a"/>
+          <circle cx="40" cy="55" r="1.1" fill="#ffb16a"/>
+        </svg>
+      </div>`,
+    iconSize: [22, 22],
+    iconAnchor: [11, 11],
+  });
+  const marker = window.L.marker([0, 0], { icon: vehicleIcon, interactive: false }).addTo(map);
   map.setView([0, 0], MAP_DYNAMIC_ZOOM, { animate: false });
 
   streetMapState.map = map;
@@ -603,11 +644,35 @@ function positionMapNode(host){
     node.hidden = true;
     return;
   }
+  const hostRect = host.getBoundingClientRect();
   const rect = panel.getBoundingClientRect();
-  node.style.left = `${Math.round(rect.left)}px`;
-  node.style.top = `${Math.round(rect.top)}px`;
-  node.style.width = `${Math.round(rect.width)}px`;
-  node.style.height = `${Math.round(rect.height)}px`;
+  if(!streetMapState.expanded){
+    node.classList.remove("expanded");
+    node.style.removeProperty("--speed-pin-top");
+    node.style.removeProperty("--speed-pin-right");
+    node.style.left = `${Math.round(rect.left)}px`;
+    node.style.top = `${Math.round(rect.top)}px`;
+    node.style.width = `${Math.round(rect.width)}px`;
+    node.style.height = `${Math.round(rect.height)}px`;
+    return;
+  }
+
+  node.classList.add("expanded");
+  const pad = 8;
+  const expandPad = 1;
+  const left = hostRect.left + expandPad;
+  const top = hostRect.top + expandPad;
+  const width = Math.max(120, hostRect.width - (2 * expandPad));
+  const height = Math.max(80, hostRect.height - (2 * expandPad));
+  const expandedRight = left + width;
+  const pinnedTop = Math.max(8, Math.round((rect.top - top) + 10));
+  const pinnedRight = Math.max(8, Math.round((expandedRight - rect.right) + 10));
+  node.style.setProperty("--speed-pin-top", `${pinnedTop}px`);
+  node.style.setProperty("--speed-pin-right", `${pinnedRight}px`);
+  node.style.left = `${Math.round(left)}px`;
+  node.style.top = `${Math.round(top)}px`;
+  node.style.width = `${Math.round(width)}px`;
+  node.style.height = `${Math.round(height)}px`;
 }
 
 function refreshMapNode(payload){
@@ -653,7 +718,7 @@ function refreshMapNode(payload){
     canvasEl.classList.add("is-hidden");
     fallbackEl.classList.remove("is-hidden");
     statusEl.textContent = streetMapState.status;
-    speedLimitValueEl.textContent = "--";
+    speedLimitValueEl.textContent = streetMapState.speedLabel || "--";
     speedLimitEl.classList.add("is-muted");
     speedLimitEl.classList.remove("is-3d", "is-4d");
     canvasEl.style.transform = "";
@@ -703,6 +768,11 @@ function refreshMapNode(payload){
   map.setView([lat, lon], mapZoom, { animate: false });
   if(streetMapState.marker){
     streetMapState.marker.setLatLng([lat, lon]);
+    const markerEl = streetMapState.marker.getElement();
+    const vehicleEl = markerEl?.querySelector(".street-map-vehicle");
+    if(vehicleEl){
+      vehicleEl.style.setProperty("--heading-deg", `${streetMapState.headingDeg.toFixed(1)}deg`);
+    }
   }
 }
 
