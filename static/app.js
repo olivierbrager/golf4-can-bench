@@ -8,6 +8,7 @@ const $$ = (s) => Array.from(document.querySelectorAll(s));
 const qs = new URLSearchParams(window.location.search);
 const fullscreenStreet = qs.get("fullscreen") === "street";
 const streetMapEnabled = qs.get("map") !== "0";
+const streetBottomMetricsEnabled = fullscreenStreet || qs.get("bottomMetrics") === "1";
 
 function showView(name){
   $$("#tabs .tab").forEach(t => t.classList.toggle("active", t.dataset.view === name));
@@ -40,10 +41,10 @@ const core = new Core({
 core.onPayload((p) => {
   renderDebug(p);
   renderDev(p);
-  renderStreet(p, { enableMap: streetMapEnabled });
+  renderStreet(p, { enableMap: streetMapEnabled, enableBottomMetrics: streetBottomMetricsEnabled });
 });
 
 // Render a baseline shell immediately (before first WS payload), useful for fullscreen mode.
-renderStreet({ signals:{}, raw:{}, meta:{} }, { enableMap: streetMapEnabled });
+renderStreet({ signals:{}, raw:{}, meta:{} }, { enableMap: streetMapEnabled, enableBottomMetrics: streetBottomMetricsEnabled });
 
 core.connect();

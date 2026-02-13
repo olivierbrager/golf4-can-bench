@@ -532,6 +532,7 @@ function refreshMapNode(payload){
 
 export function renderStreet(payload, options = {}){
   const enableMap = options.enableMap !== false;
+  const enableBottomMetrics = options.enableBottomMetrics === true;
   const streetVisible = isStreetVisible();
   if(enableMap && streetVisible){
     ensureFileGpsPoll();
@@ -543,6 +544,9 @@ export function renderStreet(payload, options = {}){
   const thr = getSig(payload,"Throttle");
   const load = getSig(payload,"Load");
   const iat = getAny(payload, "IAT_C");
+  const oil = getFirst(payload, ["OilTemp", "OilTemp_C", "Oil_Temp", "OilTemperature"]);
+  const fuel = getFirst(payload, ["FuelLevel", "Fuel", "FuelPct", "FuelPercent"]);
+  const coolant = getFirst(payload, ["CoolantTemp", "ECT", "WaterTemp", "Coolant"]);
   const gear = getAny(payload, "Gear");
 
   const speed = spd ? spd.v : null;
@@ -568,6 +572,10 @@ export function renderStreet(payload, options = {}){
   const brakeOn = sigOn(payload, ["BrakeSwitch", "Brake"]);
   const parkOn = sigOn(payload, ["ClutchSwitch"]);
   const cruiseOn = sigOn(payload, ["Cruise", "CruiseActive"]);
+  const oilText = Number.isFinite(Number(oil?.v)) ? `${int(oil?.v)}°C` : "—";
+  const fuelText = Number.isFinite(Number(fuel?.v)) ? `${int(fuel?.v)}%` : "—";
+  const boostText = Number.isFinite(Number(bst?.v)) ? `${fmt(bst?.v, 1)} bar` : "—";
+  const waterText = Number.isFinite(Number(coolant?.v)) ? `${int(coolant?.v)}°C` : "—";
 
   const warningTopItems = [
     { kind: "arrow", on: cruiseOn && blinkOn, title: "Left indicator", dir: "left", text: "\u25b6" },
@@ -704,7 +712,7 @@ export function renderStreet(payload, options = {}){
         </div>
       </div>
 
-      <div class="warning-bottom" aria-hidden="true">
+      <div class="warning-bottom ${enableBottomMetrics ? "with-metrics" : ""}" ${enableBottomMetrics ? "" : 'aria-hidden="true"'}>
         <svg class="warning-outline-bottom" viewBox="0 0 420 86" preserveAspectRatio="none">
           <defs>
             <linearGradient id="warning-trace-grad-bottom" x1="0" y1="34" x2="0" y2="-6" gradientUnits="userSpaceOnUse">
@@ -716,6 +724,13 @@ export function renderStreet(payload, options = {}){
           <path class="fill" d="M-81 -6 L-17.1 29.2 A42 42 0 0 0 0 34 L420 34 A42 42 0 0 0 437.1 29.2 L501 -6 L-81 -6 Z"></path>
           <path class="trace" stroke="url(#warning-trace-grad-bottom)" d="M-81 -6 L-17.1 29.2 A42 42 0 0 0 0 34 L420 34 A42 42 0 0 0 437.1 29.2 L501 -6"></path>
         </svg>
+        ${enableBottomMetrics ? `
+        <div class="warning-bottom-strip" aria-label="Lower metrics">
+          <div class="wb-item"><span class="wb-k">OIL</span><span class="wb-v">${oilText}</span></div>
+          <div class="wb-item"><span class="wb-k">FUEL</span><span class="wb-v">${fuelText}</span></div>
+          <div class="wb-item"><span class="wb-k">BOOST</span><span class="wb-v">${boostText}</span></div>
+          <div class="wb-item"><span class="wb-k">COOLANT</span><span class="wb-v">${waterText}</span></div>
+        </div>` : ""}
       </div>
 
       <div class="bottom-bar">
