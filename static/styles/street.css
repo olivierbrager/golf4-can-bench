@@ -126,7 +126,7 @@
 .warning-bottom{
   position:absolute;
   left:50%;
-  bottom:178px;
+  bottom:163px;
   transform:translateX(-50%);
   width: var(--center-col-w);
   height: 64px;
@@ -135,7 +135,7 @@
   pointer-events:none;
 }
 body.fullscreen-street .warning-bottom{
-  bottom:45%;
+  bottom:42.8%;
   height: calc(100% * 0.075);
   min-height:52px;
   max-height:72px;
@@ -247,7 +247,7 @@ body.fullscreen-street .warning-arrow{
 
 .cluster{
   display:grid;
-  grid-template-columns: 1fr 1.15fr 1fr;
+  grid-template-columns: 1fr 1.22fr 1fr;
   gap:var(--cluster-gap);
   align-items:center;
   margin-top: 16px;
@@ -530,7 +530,7 @@ body.fullscreen-street .warning-arrow{
 }
 
 .center-panel{
-  width:94%;
+  width:98%;
   justify-self:center;
   border-radius:14px;
   border:1px solid var(--stroke);
@@ -541,8 +541,74 @@ body.fullscreen-street .warning-arrow{
     linear-gradient(180deg, rgba(255,255,255,.04), rgba(0,0,0,.7));
   box-shadow: inset 0 0 20px rgba(0,0,0,.8);
   display:grid;
-  place-items:center;
+  align-items:stretch;
+  justify-items:stretch;
+  overflow:hidden;
 }
+.street-map{
+  position:relative;
+  width:100%;
+  height:100%;
+  border-radius:10px;
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,.12);
+  background: linear-gradient(180deg, rgba(14,18,24,.92), rgba(8,11,16,.96));
+}
+.street-map::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  z-index:3;
+  background:
+    linear-gradient(90deg, rgba(0,0,0,.58) 0%, rgba(0,0,0,0) 16%, rgba(0,0,0,0) 84%, rgba(0,0,0,.58) 100%),
+    linear-gradient(180deg, rgba(0,0,0,.62) 0%, rgba(0,0,0,0) 18%, rgba(0,0,0,0) 82%, rgba(0,0,0,.62) 100%);
+}
+.street-map-frame{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  border:0;
+  /* Faux dark basemap rendering for embedded OSM tiles */
+  filter: invert(1) hue-rotate(180deg) saturate(0.62) brightness(0.82) contrast(1.08);
+}
+.street-map-canvas .leaflet-container{
+  width:100%;
+  height:100%;
+  background:#0a0d12;
+}
+.street-map-status{
+  position:absolute;
+  left:50%;
+  bottom:8px;
+  transform:translateX(-50%);
+  z-index:2;
+  max-width:88%;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  padding:4px 10px;
+  border-radius:999px;
+  border:1px solid rgba(255,255,255,.16);
+  background: rgba(0,0,0,.54);
+  color:rgba(236,244,254,.90);
+  font-family: "AudiTypeScreen", "AudiTypeWide", sans-serif;
+  font-size:11px;
+  letter-spacing:.3px;
+}
+.street-map[hidden]{
+  display:none;
+}
+.street-map-floating{
+  position:fixed;
+  z-index:7;
+}
+
+body.fullscreen-street .street-map-status{
+  font-size:12px;
+}
+
 .center-top{
   display:flex;
   justify-content:space-between;

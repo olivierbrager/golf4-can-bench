@@ -102,6 +102,33 @@ Last updated: 2026-02-12
   - dedicated icon sizing/spacing rules apply to the top warning banner.
   - bottom warning banner uses fullscreen-specific responsive positioning.
 
+## Center Panel GPS Map
+
+- The center rectangle can host a live map (`OpenStreetMap` embed).
+- Activation:
+  - enabled by default.
+  - can be disabled with query flag: `?map=0`.
+- Optional file-based temporary GPS source:
+  - file path: `static/gps_position.json`.
+  - polling period: about `2s`.
+  - if `enabled=true` and coordinates are valid, this source has priority over payload/browser GPS.
+  - route playback is supported:
+    - `points`: array of coordinates (`lat/lon`) used as timeline.
+    - `tick_s`: seconds between points (for example `1` => one point per second).
+    - `loop`: replay from first point when the end is reached.
+  - expected shape:
+    - `enabled` (boolean)
+    - `label` (string, optional)
+    - `lat` / `lon` (number)
+    - `accuracy_m` (number, optional)
+    - or route mode with `points[]`, `tick_s`, `loop`
+- GPS source priority:
+  - file source (`static/gps_position.json`) when enabled/valid.
+  - `meta.gps` (`lat/lon[/accuracy]`) if present in WS payload.
+  - fallback to browser geolocation API (`navigator.geolocation`).
+- Map updates are throttled by coordinate key (`~5 decimals`) to avoid excessive reloads.
+- On-map overlay shows source + current latitude/longitude + status text.
+
 ## Files of Record
 
 - Behavior and layout: `static/views/street.js`.

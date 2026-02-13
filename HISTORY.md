@@ -15,6 +15,36 @@ Dernière mise à jour: 2026-02-12
   - Bouton de lancement ajouté dans la Liveview: `Street Fullscreen`.
 - Conversion des PNG warnings (`static/warning_icons/*.png`) en alpha transparent (fond noir retiré).
 - Glow warnings/clignotants ajusté vers un halo de contour plus subtil (sans disque plein).
+- Intégration d’une carte GPS dans le rectangle central Street (embed OpenStreetMap):
+  - source prioritaire `meta.gps` dans le payload WS si disponible.
+  - fallback `navigator.geolocation` côté navigateur.
+  - overlay source/lat/lon + statut.
+  - option de désactivation via URL: `?map=0`.
+  - overlay carte ajusté en fullscreen (lisibilité).
+- Ajout d’une source GPS fichier locale pour position temporaire:
+  - fichier: `static/gps_position.json`
+  - si `enabled=true` et coordonnées valides, cette source est prioritaire pour la carte.
+  - fichier initialisé sur le rond-point des Champs-Elysees (Paris).
+- Correctif lisibilité carte Street:
+  - suppression du clignotement (la carte n’est plus reconstruite à chaque frame WS).
+  - ancrage visuel de la carte sur le rectangle central via positionnement DOM persistant.
+- Ajustements visuels carte Street:
+  - rectangle central légèrement agrandi.
+  - rendu carte basculé en style sombre (filtre visuel dark sur l’iframe).
+- Carte Street:
+  - suppression du cadre d’informations `GPS/LAT/LON`.
+  - zoom augmenté (fenêtre de carte resserrée autour de la position).
+  - passage en carte statique fortement zoomée (sans contrôles `+/-`).
+  - suppression de la mention OpenStreetMap visible dans la carte.
+  - correctif lien brisé: remplacement carte statique par Leaflet dynamique (zoom fixe, sans contrôles `+/-`).
+  - zoom augmenté (niveau 19).
+  - texte de statut remplacé par reverse geocoding (rue, sinon ville/commune).
+  - mode simulation trajet ajouté via `static/gps_position.json`:
+    - support `points[]` + `tick_s` + `loop`.
+    - trajet de démonstration 5 minutes provisionné (300 positions, 1 point/seconde).
+  - trajet de simulation recalculé sur réseau routier (routing OSRM, points sur routes).
+  - déplacement rendu plus fluide via interpolation entre 2 points successifs.
+  - bandeau bas enrichi avec métriques (gauche->droite): température huile, niveau carburant, suralimentation, température eau.
 
 ### Emulator
 - Nouveau scénario TX `warning_blink`:
