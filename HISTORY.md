@@ -1,6 +1,35 @@
 # Golf4 CAN Bench History
 
-Dernière mise à jour: 2026-02-12
+Dernière mise à jour: 2026-02-13
+
+## 2026-02-13
+
+### Street UI (carte / GPS / interactions)
+- Nouvelle logique de limitation de vitesse dans la carte Street:
+  - récupération `maxspeed` via Overpass autour de la position GPS.
+  - parsing km/h + conversion mph -> km/h.
+  - panneau limite en style routier OEM (position top-right de la carte).
+  - fallback conservateur: si lookup indisponible, conservation de la dernière valeur connue (au lieu de `--`).
+- Carte Street orientée selon la progression du véhicule:
+  - heading calculé sur les points GPS successifs.
+  - rotation continue avec lissage anti-jitter.
+- Perspective/zoom dynamiques:
+  - vue par défaut dézoommée.
+  - en voie rapide (limite >= 90), perspective accentuée + dézoom supplémentaire.
+  - persistance de la vue rapide si la limite devient temporairement inconnue (`--`).
+  - retour à la vue normale uniquement sur valeur numérique < 90.
+- Correctifs anti-zones noires:
+  - overscan du rendu carte fortement augmenté.
+  - `keepBuffer` Leaflet augmenté pour mieux couvrir les transformations 3D/rotation.
+- Carte agrandissable au clic:
+  - toggle réduit/agrandi avec animation (proportions conservées).
+  - en agrandi, la carte peut occuper quasi tout le dash.
+  - panneau vitesse et label rue repositionnés/affinés en mode agrandi.
+- Marqueur véhicule remplacé:
+  - point remplacé par une voiture vue de dessus (SVG), orientée selon le heading.
+  - teinte rouge "Tornado" ajustée (densité/halo/brillance).
+- Trajet de simulation GPS mis à jour:
+  - `static/gps_position.json` sur un itinéraire routier Lomont (70) -> Lure (70), 5 min, 1 point/s.
 
 ## 2026-02-12
 

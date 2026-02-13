@@ -106,6 +106,10 @@ Scenarios:
   - Audi-style dual dial cluster (left RPM, right speed).
   - Right speed scale is non-linear (0..300 km/h) with 100 km/h at vertical top.
   - Shadow needle on both dials represents rolling max (1s window), hidden when ~= current value.
+  - Embedded GPS map in center panel with heading-based orientation and dynamic perspective/zoom.
+  - Speed-limit sign overlay (Overpass `maxspeed`, km/h display, last-known value fallback).
+  - Click-to-expand map mode (large dashboard overlay, animated toggle).
+  - Top-view vehicle marker (red "Tornado" style) oriented by movement heading.
   - Uses compatibility aliases (`compat.signals`) to stay robust across DBC variants.
   - Retained counter settings/spec: `docs/street-counters-spec.md`.
   - Fullscreen mode: `/webui/index.html?fullscreen=street`.
