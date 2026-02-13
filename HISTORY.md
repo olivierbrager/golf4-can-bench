@@ -4,6 +4,12 @@ Dernière mise à jour: 2026-02-13
 
 ## 2026-02-13
 
+### Race UI (GPS / IMU / chronométrie)
+- Spécification fonctionnelle du mode `Race` ajoutée dans la documentation:
+  - avec un récepteur GPS + des accéléromètres, possibilité de reconstituer le tracé du circuit.
+  - définition de secteurs intermédiaires sur le tracé.
+  - comparaison en temps réel du tour en cours par rapport au meilleur tour (`delta` live).
+
 ### Street UI (carte / GPS / interactions)
 - Nouvelle logique de limitation de vitesse dans la carte Street:
   - récupération `maxspeed` via Overpass autour de la position GPS.

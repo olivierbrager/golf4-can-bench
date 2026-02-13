@@ -13,7 +13,7 @@ This repo contains:
 - Access to a CAN interface `can0` (e.g. gs_usb)
 
 Python packages:
-- `python-can`, `cantools`, `fastapi`, `uvicorn[standard]`, `pyyaml`
+- `python-can`, `cantools`, `fastapi`, `uvicorn[standard]`, `pyyaml`, `websockets`
 
 ## Quick setup
 
@@ -94,7 +94,7 @@ Scenarios:
 #### Interface (Liveview)
 - Top bar: WebSocket status (`connected/connecting`), visual latency via the dot (green/red).
 - CAN/DBC info bar: CAN source, loaded DBC, RX counters, and `stale` indicator.
-- Tabs: `Debug` (full payload), `Dev` (KPIs + derived), `Street` (dashboard Audi-style), `Race` (placeholder).
+- Tabs: `Debug` (full payload), `Dev` (KPIs + derived), `Street` (dashboard Audi-style), `Race` (GPS/IMU lap timing).
 - Debug:
   - Full-text filter (e.g. `RPM`, `MAP`, `0x280`) on the payload.
   - Flags (MIL/EPC/Fan/...).
@@ -114,6 +114,10 @@ Scenarios:
   - Retained counter settings/spec: `docs/street-counters-spec.md`.
   - Fullscreen mode: `/webui/index.html?fullscreen=street`.
   - Quick launch button available in Liveview top bar: `Street Fullscreen`.
+- Race:
+  - Avec un récepteur GPS + des accéléromètres, reconstitution du tracé du circuit.
+  - Définition de secteurs intermédiaires sur le tracé.
+  - Comparaison temps réel du tour en cours vs meilleur tour (`delta` live).
 
 #### Snapshots (UI)
 Debug:

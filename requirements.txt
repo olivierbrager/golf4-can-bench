@@ -1,4 +1,6 @@
-fastapi>=0.110
-uvicorn[standard]>=0.24
-python-can>=4.3
-cantools>=39.0
+fastapi>=0.128
+uvicorn[standard]>=0.40
+python-can>=4.6
+cantools>=41.0
+pyyaml>=6.0
+websockets>=16.0
