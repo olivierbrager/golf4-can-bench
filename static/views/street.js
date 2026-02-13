@@ -4,6 +4,7 @@ const rpmHistory = [];
 const speedHistory = [];
 const MAP_DYNAMIC_ZOOM = 17.2;
 const MAP_FAST_ZOOM = 15.8;
+const MAP_EXPANDED_TOP_ZOOM = 17.9;
 const FILE_GPS_URL = "/static/gps_position.json";
 const FILE_GPS_POLL_MS = 2000;
 const GPS_STALE_MS = 8000;
@@ -754,7 +755,10 @@ function refreshMapNode(payload){
   }else{
     canvasEl.style.transform = `rotateX(18deg) rotate(${rotateDeg.toFixed(2)}deg) scale(1.24) translateY(10px)`;
   }
-  const mapZoom = isFastRoad ? MAP_FAST_ZOOM : MAP_DYNAMIC_ZOOM;
+  let mapZoom = isFastRoad ? MAP_FAST_ZOOM : MAP_DYNAMIC_ZOOM;
+  if(streetMapState.expanded && !isFastRoad){
+    mapZoom = MAP_EXPANDED_TOP_ZOOM;
+  }
 
   const key = `${lat.toFixed(5)}:${lon.toFixed(5)}:${Math.round(finiteNum(streetMapState.accM) || 0)}:${mapZoom.toFixed(1)}`;
   if(key === streetMapState.lastCenterKey) return;
