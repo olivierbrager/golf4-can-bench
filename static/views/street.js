@@ -5,6 +5,7 @@ const speedHistory = [];
 const MAP_DYNAMIC_ZOOM = 19;
 const FILE_GPS_URL = "/static/gps_position.json";
 const FILE_GPS_POLL_MS = 2000;
+const GPS_STALE_MS = 8000;
 const GEO_REVERSE_URL = "https://nominatim.openstreetmap.org/reverse";
 const GEO_REVERSE_MIN_MS = 15000;
 const GEO_REVERSE_MOVE_DEG = 0.0002;
@@ -403,6 +404,7 @@ function ensureMapNode(){
   root.hidden = true;
   root.innerHTML = `
     <div class="street-map-frame street-map-canvas"></div>
+    <img class="street-map-fallback" src="/static/wind-rose-compass.png" alt="Compass fallback">
     <div class="street-map-status" id="street-map-status">GPS en attente</div>
   `;
   document.body.appendChild(root);
@@ -461,6 +463,7 @@ function positionMapNode(host){
 }
 
 function refreshMapNode(payload){
+  let gotFreshPoint = false;
   const filePoint = fileGpsPointNow();
   if(filePoint){
     streetMapState.lat = filePoint.lat;
@@ -469,6 +472,7 @@ function refreshMapNode(payload){
     streetMapState.tsMs = Date.now();
     streetMapState.source = filePoint.label ? `file:${filePoint.label}` : filePoint.source;
     streetMapState.status = "Position GPS fichier";
+    gotFreshPoint = true;
   }else{
     const gps = readGpsFromPayload(payload);
     if(gps){
@@ -478,17 +482,34 @@ function refreshMapNode(payload){
       streetMapState.tsMs = Date.now();
       streetMapState.source = gps.source;
       streetMapState.status = "Position GPS bus reçue";
+      gotFreshPoint = true;
     }
   }
 
   const node = ensureMapNode();
+  const canvasEl = node.querySelector(".street-map-canvas");
+  const fallbackEl = node.querySelector(".street-map-fallback");
   const statusEl = node.querySelector("#street-map-status");
-  if(!statusEl) return;
-  statusEl.textContent = streetMapState.status;
+  if(!statusEl || !canvasEl || !fallbackEl) return;
 
   const lat = finiteNum(streetMapState.lat);
   const lon = finiteNum(streetMapState.lon);
-  if(lat === null || lon === null) return;
+  const ageMs = Date.now() - (streetMapState.tsMs || 0);
+  const gpsAlive = (lat !== null && lon !== null && ageMs <= GPS_STALE_MS);
+  if(!gpsAlive){
+    if(!gotFreshPoint){
+      streetMapState.status = "GPS indisponible";
+    }
+    canvasEl.classList.add("is-hidden");
+    fallbackEl.classList.remove("is-hidden");
+    statusEl.textContent = streetMapState.status;
+    streetMapState.geoLabel = "";
+    return;
+  }
+
+  canvasEl.classList.remove("is-hidden");
+  fallbackEl.classList.add("is-hidden");
+  statusEl.textContent = streetMapState.status;
   refreshReverseGeocode(lat, lon);
   if(streetMapState.geoLabel){
     statusEl.textContent = streetMapState.geoLabel;

@@ -578,6 +578,21 @@ body.fullscreen-street .warning-arrow{
   height:100%;
   background:#0a0d12;
 }
+.street-map-fallback{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  object-position:center;
+  padding:14px;
+  box-sizing:border-box;
+  filter: contrast(1.05) saturate(.96) brightness(.86);
+}
+.street-map-canvas.is-hidden,
+.street-map-fallback.is-hidden{
+  display:none;
+}
 .street-map-status{
   position:absolute;
   left:50%;
