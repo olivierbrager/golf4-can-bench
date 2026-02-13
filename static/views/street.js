@@ -2,13 +2,18 @@ const $ = (s) => document.querySelector(s);
 const SHADOW_WINDOW_MS = 1000;
 const rpmHistory = [];
 const speedHistory = [];
-const MAP_DYNAMIC_ZOOM = 19;
+const MAP_DYNAMIC_ZOOM = 17.2;
+const MAP_FAST_ZOOM = 15.8;
 const FILE_GPS_URL = "/static/gps_position.json";
 const FILE_GPS_POLL_MS = 2000;
 const GPS_STALE_MS = 8000;
 const GEO_REVERSE_URL = "https://nominatim.openstreetmap.org/reverse";
 const GEO_REVERSE_MIN_MS = 15000;
 const GEO_REVERSE_MOVE_DEG = 0.0002;
+const MAP_HEADING_MIN_MOVE_M = 2.5;
+const SPEED_LIMIT_OVERPASS_URL = "https://overpass-api.de/api/interpreter";
+const SPEED_LIMIT_MIN_MS = 12000;
+const SPEED_LIMIT_MOVE_DEG = 0.00028;
 
 const streetMapState = {
   node: null,
@@ -25,6 +30,11 @@ const streetMapState = {
   geoLat: null,
   geoLon: null,
   geoLabel: "",
+  speedBusy: false,
+  speedTsMs: 0,
+  speedLat: null,
+  speedLon: null,
+  speedLabel: "--",
   routeIdx: 0,
   routeLastStepMs: 0,
   routeSig: "",
@@ -35,6 +45,11 @@ const streetMapState = {
   tsMs: 0,
   status: "GPS en attente",
   lastCenterKey: "",
+  headingDeg: 0,
+  headingReady: false,
+  prevLat: null,
+  prevLon: null,
+  fastViewOn: false,
 };
 
 function getSig(payload, name){
@@ -331,6 +346,134 @@ function refreshReverseGeocode(lat, lon){
     });
 }
 
+function distMeters(latA, lonA, latB, lonB){
+  const x = (lonB - lonA) * 111320 * Math.cos(((latA + latB) * Math.PI) / 360);
+  const y = (latB - latA) * 110540;
+  return Math.hypot(x, y);
+}
+
+function wrapDeg180(v){
+  let x = v;
+  while(x > 180) x -= 360;
+  while(x < -180) x += 360;
+  return x;
+}
+
+function bearingDeg(latA, lonA, latB, lonB){
+  const y = (lonB - lonA) * Math.cos(((latA + latB) * Math.PI) / 360);
+  const x = latB - latA;
+  const deg = Math.atan2(y, x) * (180 / Math.PI);
+  return (deg + 360) % 360;
+}
+
+function updateHeading(lat, lon){
+  const prevLat = finiteNum(streetMapState.prevLat);
+  const prevLon = finiteNum(streetMapState.prevLon);
+  streetMapState.prevLat = lat;
+  streetMapState.prevLon = lon;
+  if(prevLat === null || prevLon === null) return;
+  const moveM = distMeters(prevLat, prevLon, lat, lon);
+  if(moveM < MAP_HEADING_MIN_MOVE_M) return;
+  const raw = bearingDeg(prevLat, prevLon, lat, lon);
+  if(!streetMapState.headingReady){
+    streetMapState.headingDeg = raw;
+    streetMapState.headingReady = true;
+    return;
+  }
+  const cur = streetMapState.headingDeg;
+  const delta = wrapDeg180(raw - cur);
+  streetMapState.headingDeg = (cur + (delta * 0.28) + 360) % 360;
+}
+
+function parseMaxSpeedKph(raw){
+  const txt = String(raw || "").trim().toLowerCase();
+  if(!txt) return null;
+  const mph = txt.match(/(\d+(?:\.\d+)?)\s*(mph|mi\/h)/);
+  if(mph){
+    const n = Number(mph[1]);
+    if(Number.isFinite(n)) return Math.round(n * 1.60934);
+    return null;
+  }
+  const kmh = txt.match(/(\d+(?:\.\d+)?)/);
+  if(kmh){
+    const n = Number(kmh[1]);
+    if(Number.isFinite(n)) return Math.round(n);
+  }
+  return null;
+}
+
+function pickSpeedLimitKph(elements, lat, lon){
+  if(!Array.isArray(elements) || !elements.length) return null;
+  let best = null;
+  for(const el of elements){
+    const raw = el?.tags?.maxspeed;
+    const kph = parseMaxSpeedKph(raw);
+    if(!Number.isFinite(kph)) continue;
+    const geom = Array.isArray(el?.geometry) ? el.geometry : [];
+    if(!geom.length) continue;
+    let dMin = Infinity;
+    for(const p of geom){
+      const plat = finiteNum(p?.lat);
+      const plon = finiteNum(p?.lon);
+      if(plat === null || plon === null) continue;
+      const d = distMeters(lat, lon, plat, plon);
+      if(d < dMin) dMin = d;
+    }
+    if(!Number.isFinite(dMin)) continue;
+    if(!best || dMin < best.d){
+      best = { d: dMin, kph };
+    }
+  }
+  if(!best) return null;
+  return best.kph;
+}
+
+function shouldSpeedLookup(lat, lon, nowMs){
+  if(streetMapState.speedBusy) return false;
+  const lastLat = finiteNum(streetMapState.speedLat);
+  const lastLon = finiteNum(streetMapState.speedLon);
+  const since = nowMs - (streetMapState.speedTsMs || 0);
+  if(lastLat === null || lastLon === null) return true;
+  const moved = Math.abs(lat - lastLat) + Math.abs(lon - lastLon);
+  if(moved >= SPEED_LIMIT_MOVE_DEG) return since >= 2500;
+  return since >= SPEED_LIMIT_MIN_MS;
+}
+
+async function fetchSpeedLimit(lat, lon){
+  const q = `[out:json][timeout:8];way(around:45,${lat},${lon})["highway"]["maxspeed"];out tags geom;`;
+  const r = await fetch(SPEED_LIMIT_OVERPASS_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "text/plain;charset=UTF-8",
+      Accept: "application/json",
+    },
+    body: q,
+    cache: "no-store",
+  });
+  if(!r.ok) return null;
+  const data = await r.json();
+  return pickSpeedLimitKph(data?.elements || [], lat, lon);
+}
+
+function refreshSpeedLimit(lat, lon){
+  const nowMs = Date.now();
+  if(!shouldSpeedLookup(lat, lon, nowMs)) return;
+  streetMapState.speedBusy = true;
+  streetMapState.speedTsMs = nowMs;
+  streetMapState.speedLat = lat;
+  streetMapState.speedLon = lon;
+  void fetchSpeedLimit(lat, lon)
+    .then((kph) => {
+      streetMapState.speedLabel = Number.isFinite(kph) ? String(kph) : "--";
+    })
+    .catch(() => {
+      streetMapState.speedLabel = "--";
+    })
+    .finally(() => {
+      streetMapState.speedBusy = false;
+    });
+}
+
 async function pollFileGpsOnce(){
   if(streetMapState.filePollBusy) return;
   streetMapState.filePollBusy = true;
@@ -405,6 +548,9 @@ function ensureMapNode(){
   root.innerHTML = `
     <div class="street-map-frame street-map-canvas"></div>
     <img class="street-map-fallback" src="/static/wind-rose-compass.png" alt="Compass fallback">
+    <div class="street-speed-limit" id="street-speed-limit" aria-label="Speed limit">
+      <span class="street-speed-limit-value">--</span>
+    </div>
     <div class="street-map-status" id="street-map-status">GPS en attente</div>
   `;
   document.body.appendChild(root);
@@ -430,9 +576,11 @@ function ensureLeafletMap(){
     boxZoom: false,
     keyboard: false,
     touchZoom: false,
+    updateWhenIdle: true,
   });
   window.L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
     maxZoom: 19,
+    keepBuffer: 12,
   }).addTo(map);
   const marker = window.L.circleMarker([0, 0], {
     radius: 5,
@@ -490,7 +638,9 @@ function refreshMapNode(payload){
   const canvasEl = node.querySelector(".street-map-canvas");
   const fallbackEl = node.querySelector(".street-map-fallback");
   const statusEl = node.querySelector("#street-map-status");
-  if(!statusEl || !canvasEl || !fallbackEl) return;
+  const speedLimitEl = node.querySelector("#street-speed-limit");
+  const speedLimitValueEl = node.querySelector(".street-speed-limit-value");
+  if(!statusEl || !canvasEl || !fallbackEl || !speedLimitEl || !speedLimitValueEl) return;
 
   const lat = finiteNum(streetMapState.lat);
   const lon = finiteNum(streetMapState.lon);
@@ -503,6 +653,10 @@ function refreshMapNode(payload){
     canvasEl.classList.add("is-hidden");
     fallbackEl.classList.remove("is-hidden");
     statusEl.textContent = streetMapState.status;
+    speedLimitValueEl.textContent = "--";
+    speedLimitEl.classList.add("is-muted");
+    speedLimitEl.classList.remove("is-3d", "is-4d");
+    canvasEl.style.transform = "";
     streetMapState.geoLabel = "";
     return;
   }
@@ -511,11 +665,33 @@ function refreshMapNode(payload){
   fallbackEl.classList.add("is-hidden");
   statusEl.textContent = streetMapState.status;
   refreshReverseGeocode(lat, lon);
+  refreshSpeedLimit(lat, lon);
   if(streetMapState.geoLabel){
     statusEl.textContent = streetMapState.geoLabel;
   }
+  const speedLabel = streetMapState.speedLabel || "--";
+  speedLimitValueEl.textContent = speedLabel;
+  const speedNum = Number(speedLabel);
+  const digits = Number.isFinite(speedNum) ? String(Math.round(Math.abs(speedNum))).length : 0;
+  const hasNumericSpeedLimit = Number.isFinite(speedNum);
+  if(hasNumericSpeedLimit){
+    streetMapState.fastViewOn = speedNum >= 90;
+  }
+  const isFastRoad = streetMapState.fastViewOn === true;
+  speedLimitEl.classList.toggle("is-muted", !Number.isFinite(speedNum));
+  speedLimitEl.classList.toggle("is-3d", digits === 3);
+  speedLimitEl.classList.toggle("is-4d", digits >= 4);
+  canvasEl.classList.toggle("is-fast-3d", isFastRoad);
+  updateHeading(lat, lon);
+  const rotateDeg = -streetMapState.headingDeg;
+  if(isFastRoad){
+    canvasEl.style.transform = `rotateX(46deg) rotate(${rotateDeg.toFixed(2)}deg) scale(1.46) translateY(32px)`;
+  }else{
+    canvasEl.style.transform = `rotateX(18deg) rotate(${rotateDeg.toFixed(2)}deg) scale(1.24) translateY(10px)`;
+  }
+  const mapZoom = isFastRoad ? MAP_FAST_ZOOM : MAP_DYNAMIC_ZOOM;
 
-  const key = `${lat.toFixed(5)}:${lon.toFixed(5)}:${Math.round(finiteNum(streetMapState.accM) || 0)}:${MAP_DYNAMIC_ZOOM}`;
+  const key = `${lat.toFixed(5)}:${lon.toFixed(5)}:${Math.round(finiteNum(streetMapState.accM) || 0)}:${mapZoom.toFixed(1)}`;
   if(key === streetMapState.lastCenterKey) return;
   streetMapState.lastCenterKey = key;
 
@@ -524,7 +700,7 @@ function refreshMapNode(payload){
     statusEl.textContent = "Carte indisponible (Leaflet non charge)";
     return;
   }
-  map.setView([lat, lon], MAP_DYNAMIC_ZOOM, { animate: false });
+  map.setView([lat, lon], mapZoom, { animate: false });
   if(streetMapState.marker){
     streetMapState.marker.setLatLng([lat, lon]);
   }
