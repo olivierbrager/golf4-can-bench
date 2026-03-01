@@ -124,6 +124,10 @@ body.fullscreen-street{
   overflow:hidden;
   background:#02050a;
 }
+body.fullscreen-street,
+body.fullscreen-street *{
+  cursor:none !important;
+}
 body.fullscreen-street .wrap{
   max-width:none;
   width:100vw;
