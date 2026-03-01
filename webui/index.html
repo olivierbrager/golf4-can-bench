@@ -4,6 +4,18 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>CAN Dashboards (Base clean)</title>
+  <script>
+    (function () {
+      const fsStreet = new URLSearchParams(window.location.search).get("fullscreen") === "street";
+      if (fsStreet) {
+        document.documentElement.classList.add("boot-fullscreen-street");
+      }
+    })();
+  </script>
+  <style>
+    html.boot-fullscreen-street body { background: #000; }
+    html.boot-fullscreen-street body:not(.fullscreen-street) .wrap { visibility: hidden; }
+  </style>
   <link rel="stylesheet" href="/static/styles/base.css?v=baseclean4">
   <link rel="stylesheet" href="/static/styles/dev.css">
   <link rel="stylesheet" href="/static/styles/debug.css?v=baseclean2">

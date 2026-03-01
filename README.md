@@ -212,6 +212,9 @@ Le repo fournit des exemples dans `systemd/`:
 - `systemd/liveview.service.example`
 - `systemd/can-tx.service.example`
 - `systemd/chromium-kiosk.service.example`
+- `systemd/chromium-kiosk-sway.service.example`
+- `systemd/sway-kiosk.conf.example`
+- `systemd/plymouth-quit.override.conf.example`
 
 ### Install Raspberry Pi 5 (recommandé)
 Installation automatique (services + venv + env file):
@@ -272,6 +275,17 @@ Kiosk Chromium (optionnel)
 sudo systemctl enable --now chromium-kiosk.service
 systemctl status chromium-kiosk.service --no-pager
 journalctl -u chromium-kiosk.service -f
+```
+
+Kiosk Chromium via Sway + transition Plymouth (RPI5)
+```bash
+sudo install -d /etc/sway /etc/systemd/system/plymouth-quit.service.d
+sudo cp systemd/sway-kiosk.conf.example /etc/sway/kiosk.conf
+sudo cp systemd/chromium-kiosk-sway.service.example /etc/systemd/system/chromium-kiosk-sway.service
+sudo cp systemd/plymouth-quit.override.conf.example /etc/systemd/system/plymouth-quit.service.d/override.conf
+sudo systemctl daemon-reload
+sudo systemctl disable --now chromium-kiosk.service || true
+sudo systemctl enable --now chromium-kiosk-sway.service
 ```
 
 ### Boot direct dashboard (RPI5)

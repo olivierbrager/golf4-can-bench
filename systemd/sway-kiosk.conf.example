@@ -1,0 +1,24 @@
+# Golf4 kiosk sway config (single-app fullscreen)
+# Validated for 1600x600 kiosk screen.
+
+xwayland disable
+focus_follows_mouse no
+mouse_warping none
+
+default_border none
+default_floating_border none
+floating_modifier none
+
+gaps inner 0
+gaps outer 0
+
+output * bg /usr/share/plymouth/themes/golf4/splash.png fit
+
+# Hide cursor immediately and ignore physical mouse devices (touch still works)
+seat * hide_cursor 1
+input type:pointer {
+  events disabled
+}
+
+# Start Chromium kiosk
+exec /usr/bin/chromium --no-sandbox --ozone-platform=wayland --enable-features=UseOzonePlatform --disable-features=Translate --lang=fr-FR --deny-permission-prompts --kiosk --incognito --noerrdialogs --disable-session-crashed-bubble --disable-infobars --overscroll-history-navigation=0 "http://127.0.0.1:8011/?fullscreen=street"

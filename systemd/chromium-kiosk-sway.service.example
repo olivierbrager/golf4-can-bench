@@ -1,0 +1,25 @@
+[Unit]
+Description=Chromium kiosk (Wayland/Sway) for Golf4 Liveview
+After=systemd-user-sessions.service liveview.service plymouth-quit.service plymouth-quit-wait.service
+Wants=liveview.service plymouth-quit.service
+Conflicts=getty@tty1.service
+After=getty@tty1.service
+
+[Service]
+User=root
+PAMName=login
+TTYPath=/dev/tty1
+TTYReset=no
+TTYVHangup=yes
+TTYVTDisallocate=no
+StandardInput=tty
+StandardOutput=journal
+StandardError=journal
+Environment=WLR_RENDERER_ALLOW_SOFTWARE=1
+Environment=WLR_NO_HARDWARE_CURSORS=1
+ExecStart=/usr/bin/sway -c /etc/sway/kiosk.conf
+Restart=always
+RestartSec=0.5
+
+[Install]
+WantedBy=multi-user.target
