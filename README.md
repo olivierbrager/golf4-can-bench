@@ -301,6 +301,22 @@ Le mode `--fast-boot` applique:
 - désactivation des unités `*-wait-online` (attentes réseau inutiles)
 - services `can0/liveview/chromium-kiosk` allégés pour partir plus tôt
 
+### Boot branding one-shot (RPI5)
+Pour appliquer en une fois le branding boot (Plymouth + Sway kiosk + handoff + EEPROM quiet):
+```bash
+sudo ./scripts/apply_rpi5_boot_branding.sh
+sudo reboot
+```
+
+Options utiles:
+```bash
+# image splash personnalisée
+sudo ./scripts/apply_rpi5_boot_branding.sh --splash /opt/DashBoard/golf4-can-bench/static/Splash_OB_black.png
+
+# ignorer l'EEPROM (si tu veux seulement la partie Linux/Plymouth/Sway)
+sudo ./scripts/apply_rpi5_boot_branding.sh --skip-eeprom
+```
+
 ## Configuration
 ### DBC
 
