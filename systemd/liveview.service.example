@@ -1,7 +1,6 @@
 [Unit]
 Description=Golf4 CAN Liveview (Base clean)
-After=network-online.target can0.service
-Wants=network-online.target
+After=can0.service
 
 [Service]
 Type=simple

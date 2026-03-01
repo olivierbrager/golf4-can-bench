@@ -1,7 +1,5 @@
 [Unit]
 Description=SocketCAN can0 (gs_usb) 500k
-After=network-online.target
-Wants=network-online.target
 
 [Service]
 Type=oneshot

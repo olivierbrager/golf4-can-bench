@@ -9,6 +9,7 @@ KIOSK_URL="${KIOSK_URL:-http://127.0.0.1:8011/?fullscreen=street}"
 WITH_TX=0
 WITH_KIOSK=1
 INSTALL_PACKAGES=1
+FAST_BOOT=0
 CHROMIUM_BIN=""
 
 usage() {
@@ -19,6 +20,7 @@ Options:
   --with-tx            Enable can-tx.service
   --without-kiosk      Do not install/enable Chromium kiosk service
   --skip-packages      Skip apt package installation
+  --fast-boot          Disable splash/wait-online services for faster boot to dashboard
   --repo-dir PATH      Override repository directory
   --app-user USER      User running liveview/kiosk services
   --bitrate N          CAN bitrate (default: 500000)
@@ -35,11 +37,50 @@ enable_now_or_warn() {
   fi
 }
 
+disable_if_exists() {
+  local unit="$1"
+  if systemctl list-unit-files "$unit" >/dev/null 2>&1; then
+    systemctl disable --now "$unit" >/dev/null 2>&1 || true
+  fi
+}
+
+apply_fast_boot_tweaks() {
+  local cmdline_file=""
+  if [[ -f /boot/firmware/cmdline.txt ]]; then
+    cmdline_file="/boot/firmware/cmdline.txt"
+  elif [[ -f /boot/cmdline.txt ]]; then
+    cmdline_file="/boot/cmdline.txt"
+  fi
+
+  if [[ -n "$cmdline_file" ]]; then
+    cp "$cmdline_file" "${cmdline_file}.bak.$(date +%Y%m%d-%H%M%S)"
+    local line
+    line="$(cat "$cmdline_file")"
+    line="$(echo "$line" | sed -E 's/(^| )splash( |$)/ /g')"
+    line="$(echo "$line" | sed -E 's/(^| )quiet( |$)/ /g')"
+    line="$(echo "$line" | sed -E 's/(^| )plymouth\.ignore-serial-consoles( |$)/ /g')"
+    line="$(echo "$line" | sed -E 's/(^| )vt\.global_cursor_default=[^ ]+( |$)/ /g')"
+    line="$(echo "$line" | tr -s ' ' | sed -E 's/^ //; s/ $//')"
+    [[ "$line" == *"logo.nologo"* ]] || line="$line logo.nologo"
+    [[ "$line" == *"vt.global_cursor_default=0"* ]] || line="$line vt.global_cursor_default=0"
+    echo "$line" > "$cmdline_file"
+  fi
+
+  disable_if_exists plymouth-start.service
+  disable_if_exists plymouth-quit.service
+  disable_if_exists plymouth-quit-wait.service
+  disable_if_exists plymouth-read-write.service
+
+  disable_if_exists NetworkManager-wait-online.service
+  disable_if_exists systemd-networkd-wait-online.service
+}
+
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --with-tx) WITH_TX=1; shift ;;
     --without-kiosk) WITH_KIOSK=0; shift ;;
     --skip-packages) INSTALL_PACKAGES=0; shift ;;
+    --fast-boot) FAST_BOOT=1; shift ;;
     --repo-dir) REPO_DIR="$2"; shift 2 ;;
     --app-user) APP_USER="$2"; shift 2 ;;
     --bitrate) BITRATE="$2"; shift 2 ;;
@@ -130,6 +171,10 @@ fi
 
 if [[ "$WITH_KIOSK" -eq 1 ]]; then
   enable_now_or_warn chromium-kiosk.service
+fi
+
+if [[ "$FAST_BOOT" -eq 1 ]]; then
+  apply_fast_boot_tweaks
 fi
 
 echo

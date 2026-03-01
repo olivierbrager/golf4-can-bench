@@ -231,6 +231,9 @@ sudo ./scripts/install_rpi5_kiosk.sh --bitrate 1000000
 
 # sans kiosk Chromium
 sudo ./scripts/install_rpi5_kiosk.sh --without-kiosk
+
+# boot plus rapide + sans splashscreen
+sudo ./scripts/install_rpi5_kiosk.sh --fast-boot
 ```
 
 Le script configure:
@@ -270,6 +273,19 @@ sudo systemctl enable --now chromium-kiosk.service
 systemctl status chromium-kiosk.service --no-pager
 journalctl -u chromium-kiosk.service -f
 ```
+
+### Boot direct dashboard (RPI5)
+Pour démarrer au plus vite et sans splashscreen:
+```bash
+sudo ./scripts/install_rpi5_kiosk.sh --fast-boot
+sudo reboot
+```
+
+Le mode `--fast-boot` applique:
+- suppression de `splash/quiet` dans `cmdline.txt` (avec backup auto)
+- désactivation des unités `plymouth*` (splash)
+- désactivation des unités `*-wait-online` (attentes réseau inutiles)
+- services `can0/liveview/chromium-kiosk` allégés pour partir plus tôt
 
 ## Configuration
 ### DBC

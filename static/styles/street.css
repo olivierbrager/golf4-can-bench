@@ -187,33 +187,66 @@
   letter-spacing:.5px;
   text-shadow: 0 1px 8px rgba(0,0,0,.72);
 }
+body.fullscreen-street{
+  /* LOCKED CALIBRATION (validated on 1600x600 kiosk screen, 2026-03-01)
+     If you need to tweak layout later, only adjust these variables. */
+  --fs-band-bottom: 220px;
+  --fs-band-bottom-metrics: 232px;
+  --fs-band-strip-bottom: -186px;
+  --fs-wb-item-shift-y: 38px;
+  --fs-bottombar-bottom: 4px;
+  --fs-bottombar-font-size: 22px;
+  --fs-bottombar-line-height: 22px;
+  --fs-bottombar-height: 22px;
+  --fs-audi-classic-height: 600px;
+}
 body.fullscreen-street .warning-bottom{
-  bottom:42.8%;
-  height: calc(100% * 0.075);
-  min-height:52px;
-  max-height:72px;
+  bottom:var(--fs-band-bottom);
+  height:64px;
 }
 body.fullscreen-street .warning-bottom.with-metrics{
   z-index:11;
-  bottom:44.8%;
-  height: calc(100% * 0.075);
-  min-height:52px;
-  max-height:72px;
+  bottom:var(--fs-band-bottom-metrics);
+  height:64px;
 }
 body.fullscreen-street .warning-bottom.with-metrics .warning-bottom-strip{
-  bottom:-208px;
+  bottom:var(--fs-band-strip-bottom);
   padding:0 8px;
   gap:62px;
   transform:none;
 }
 body.fullscreen-street .warning-bottom-strip{
-  padding:50px 20px 4px 20px;
+  padding:34px 20px 14px 20px;
 }
 body.fullscreen-street .wb-k{
-  font-size:12px;
+  font-size:13px;
+  letter-spacing:1px;
+  transform:none;
 }
 body.fullscreen-street .wb-v{
-  font-size:19px;
+  margin-top:4px;
+  font-size:24px;
+  line-height:1;
+  white-space:nowrap;
+}
+body.fullscreen-street .wb-item{
+  justify-content:center;
+  line-height:1.08;
+  gap:2px;
+  transform:translateY(var(--fs-wb-item-shift-y));
+}
+body.fullscreen-street .bottom-bar{
+  position:fixed;
+  left:16px;
+  right:16px;
+  bottom:var(--fs-bottombar-bottom);
+  margin-top:0;
+  font-size:var(--fs-bottombar-font-size);
+  line-height:var(--fs-bottombar-line-height);
+  height:var(--fs-bottombar-height);
+}
+body.fullscreen-street .audi-classic{
+  height:var(--fs-audi-classic-height);
 }
 .warning-outline-bottom{
   position:absolute;

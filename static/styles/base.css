@@ -156,8 +156,10 @@ body.fullscreen-street #view-street .body{
   padding:0;
   height:100%;
   display:grid;
-  place-items:center;
+  place-items:start center;
 }
 body.fullscreen-street #street-dashboard{
-  width:100vw;
+  width:1600px;
+  height:600px;
+  transform:none;
 }
