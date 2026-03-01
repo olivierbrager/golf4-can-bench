@@ -65,8 +65,21 @@ SPEED_FACTOR=1.0 MAP_FACTOR=1.0 ATM_KPA=101.3 \
 python -m uvicorn liveview:app --host 0.0.0.0 --port 8011
 ```
 
+Mode source distante (émulateur réseau):
+```bash
+cd /opt/golf4-can-bench
+source .venv/bin/activate
+
+SOURCE_MODE=remote REMOTE_STATE_URL=http://192.168.0.60:8001/api/state \
+DBC_PATH=dbc/golf4_ext.dbc PUSH_HZ=30 STALE_S=0.5 REMOTE_POLL_HZ=20 \
+python -m uvicorn liveview:app --host 0.0.0.0 --port 8011
+```
+
 ### Variables d’environnement (liveview)
 - `CAN_CH` (default `can0`)
+- `SOURCE_MODE` (`auto`, `can`, `remote`; default `auto`)
+- `REMOTE_STATE_URL` (default `http://192.168.0.60:8001/api/state`)
+- `REMOTE_POLL_HZ` (default `20`)
 - `DBC_PATH` (default `dbc/golf4_min.dbc`)
 - `PUSH_HZ` (default `15`)
 - `STALE_S` (default `1.0`)
@@ -197,8 +210,38 @@ Le repo fournit des exemples dans `systemd/`:
 - `systemd/can0.service`
 - `systemd/can0-watchdog.service` + `systemd/can0-watchdog.timer`
 - `systemd/liveview.service.example`
+- `systemd/can-tx.service.example`
+- `systemd/chromium-kiosk.service.example`
 
-Installe les exemples (à adapter selon ton chemin de repo):
+### Install Raspberry Pi 5 (recommandé)
+Installation automatique (services + venv + env file):
+```bash
+cd /opt/DashBoard/golf4-can-bench
+chmod +x scripts/install_rpi5_kiosk.sh
+sudo ./scripts/install_rpi5_kiosk.sh
+```
+
+Options utiles:
+```bash
+# activer aussi le TX emulator
+sudo ./scripts/install_rpi5_kiosk.sh --with-tx
+
+# changer bitrate CAN (ex: 1 Mbps)
+sudo ./scripts/install_rpi5_kiosk.sh --bitrate 1000000
+
+# sans kiosk Chromium
+sudo ./scripts/install_rpi5_kiosk.sh --without-kiosk
+```
+
+Le script configure:
+- `/etc/golf4/liveview.env`
+- `can0.service`
+- `can0-watchdog.service` + `can0-watchdog.timer`
+- `liveview.service`
+- `can-tx.service` (option `--with-tx`)
+- `chromium-kiosk.service` (activé par défaut)
+
+### Installation manuelle (si besoin)
 ```bash
 sudo cp systemd/can0.service /etc/systemd/system/
 sudo cp systemd/can0-watchdog.service /etc/systemd/system/
@@ -207,22 +250,25 @@ sudo cp systemd/liveview.service.example /etc/systemd/system/liveview.service
 sudo systemctl daemon-reload
 ```
 
-Le repo ne contient pas de `can-tx.service` prêt à l’emploi. Crée-en un similaire à `liveview.service` avec:
-- `ExecStart=uvicorn can_tx_emulator:app --host 0.0.0.0 --port 8001`
-- `WorkingDirectory=/opt/golf4-can-bench`
+RX service
+```bash
+sudo systemctl enable --now liveview.service
+systemctl status liveview.service --no-pager
+journalctl -u liveview.service -f
+```
 
-Commandes:
+TX service (optionnel)
 ```bash
 sudo systemctl enable --now can-tx.service
 systemctl status can-tx.service --no-pager
 journalctl -u can-tx.service -f
 ```
 
-RX service
+Kiosk Chromium (optionnel)
 ```bash
-sudo systemctl enable --now liveview.service
-systemctl status liveview.service --no-pager
-journalctl -u liveview.service -f
+sudo systemctl enable --now chromium-kiosk.service
+systemctl status chromium-kiosk.service --no-pager
+journalctl -u chromium-kiosk.service -f
 ```
 
 ## Configuration

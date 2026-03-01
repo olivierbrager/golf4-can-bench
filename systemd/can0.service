@@ -6,7 +6,7 @@ Wants=network-online.target
 [Service]
 Type=oneshot
 RemainAfterExit=yes
-ExecStart=/sbin/ip link set can0 down
+ExecStart=-/sbin/ip link set can0 down
 ExecStart=/sbin/ip link set can0 up type can bitrate 500000
 ExecStop=/sbin/ip link set can0 down
 

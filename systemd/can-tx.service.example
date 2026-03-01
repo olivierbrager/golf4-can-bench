@@ -1,5 +1,5 @@
 [Unit]
-Description=Golf4 CAN Liveview (Base clean)
+Description=Golf4 CAN TX emulator
 After=network-online.target can0.service
 Wants=network-online.target
 
@@ -7,8 +7,7 @@ Wants=network-online.target
 Type=simple
 User=__APP_USER__
 WorkingDirectory=__REPO_DIR__
-EnvironmentFile=/etc/golf4/liveview.env
-ExecStart=__REPO_DIR__/.venv/bin/python -m uvicorn liveview:app --host ${HOST} --port ${PORT}
+ExecStart=__REPO_DIR__/.venv/bin/python -m uvicorn can_tx_emulator:app --host 0.0.0.0 --port 8001
 Restart=always
 RestartSec=1
 

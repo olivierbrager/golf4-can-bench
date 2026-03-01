@@ -1,0 +1,19 @@
+[Unit]
+Description=Chromium kiosk for Golf4 Liveview
+After=graphical.target network-online.target liveview.service
+Wants=network-online.target liveview.service
+ConditionPathExists=/tmp/.X11-unix/X0
+StartLimitIntervalSec=300
+StartLimitBurst=5
+
+[Service]
+Type=simple
+User=__APP_USER__
+Environment=DISPLAY=:0
+ExecStartPre=/usr/bin/sleep 2
+ExecStart=__CHROMIUM_BIN__ --kiosk --incognito --noerrdialogs --disable-session-crashed-bubble --disable-infobars --overscroll-history-navigation=0 "__KIOSK_URL__"
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=graphical.target
